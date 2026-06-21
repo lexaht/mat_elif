@@ -138,6 +138,8 @@ export default {
         canvas.width = rect.width * window.devicePixelRatio;
         canvas.height = rect.height * window.devicePixelRatio;
         ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+        history.length = 0;
+        t = 0;
       }
     });
     resizeObserver.observe(container);

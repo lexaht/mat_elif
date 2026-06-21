@@ -76,6 +76,17 @@ export default {
     let showCos = false;
     let waveSpeed = 0.05;
 
+    const history = [];
+    const maxHistory = 400;
+
+    // Viewport-dependent drawing coordinates and properties
+    const circleCenter = { x: 0, y: 0 };
+    let radius = 0;
+    let waveStart = 0;
+    let waveWidth = 0;
+    let px = 0;
+    let py = 0;
+
     controls.innerHTML = `
       <div class="control-group">
         <label class="control-label">Vis funktioner:</label>
@@ -121,12 +132,11 @@ export default {
         canvas.width = rect.width * window.devicePixelRatio;
         canvas.height = rect.height * window.devicePixelRatio;
         ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+        history.length = 0;
+        t = 0;
       }
     });
     mainObserver.observe(container);
-
-    const history = [];
-    const maxHistory = 400;
 
     function drawMain() {
       const w = canvas.width / window.devicePixelRatio || container.clientWidth;
@@ -134,19 +144,20 @@ export default {
       if(w===0) return;
       ctx.clearRect(0, 0, w, h);
 
-      const circleCenter = { x: w * 0.25, y: h / 2 };
-      const radius = Math.min(w, h) * 0.3;
-      const waveStart = w * 0.5;
-      const waveWidth = w - waveStart - 15;
+      circleCenter.x = w * 0.25;
+      circleCenter.y = h / 2;
+      radius = Math.min(w, h) * 0.3;
+      waveStart = w * 0.5;
+      waveWidth = w - waveStart - 15;
       // The wave is plotted left -> right as the angle runs from 0 to 4π, then
       // wipes and starts over (oscilloscope style), so the curve stays put on
       // screen instead of scrolling away.
-      const FULL_SPAN = 4 * Math.PI;
+      const FULL_SPAN = 8 * Math.PI;
       const xFor = (rawT) => waveStart + (Math.max(0, Math.min(rawT, FULL_SPAN)) / FULL_SPAN) * waveWidth;
 
       const angle = t;
-      const px = circleCenter.x + radius * Math.cos(angle);
-      const py = circleCenter.y - radius * Math.sin(angle); // negative y because canvas y is down
+      px = circleCenter.x + radius * Math.cos(angle);
+      py = circleCenter.y - radius * Math.sin(angle); // negative y because canvas y is down
       const penX = xFor(angle); // where the "pen" is currently drawing
 
       if (isPlaying) {
@@ -169,9 +180,51 @@ export default {
       ctx.moveTo(circleCenter.x, circleCenter.y - radius - 10); ctx.lineTo(circleCenter.x, circleCenter.y + radius + 10);
       ctx.stroke();
 
+      // Draw quadrant labels on the circle
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
+      ctx.font = '10px monospace';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText("0", circleCenter.x + radius + 15, circleCenter.y);
+      ctx.fillText("π/2", circleCenter.x, circleCenter.y - radius - 15);
+      ctx.fillText("π", circleCenter.x - radius - 15, circleCenter.y);
+      ctx.fillText("3π/2", circleCenter.x, circleCenter.y + radius + 15);
+
       // Draw radius line
       ctx.strokeStyle = 'rgba(255, 255, 255, 0.8)';
       ctx.beginPath(); ctx.moveTo(circleCenter.x, circleCenter.y); ctx.lineTo(px, py); ctx.stroke();
+
+      // Draw angle arc and text on circle
+      if (angle > 0) {
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.4)';
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.arc(circleCenter.x, circleCenter.y, radius * 0.2, 0, -angle, true);
+        ctx.stroke();
+
+        const midAngle = angle / 2;
+        const textRadius = radius * 0.2 + 15;
+        const textX = circleCenter.x + textRadius * Math.cos(-midAngle);
+        const textY = circleCenter.y + textRadius * Math.sin(-midAngle);
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+        ctx.font = '10px monospace';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        const tempGetTLabel = (val) => {
+          const exactMultiple = Math.round(val / (Math.PI / 2));
+          const diff = Math.abs(val - exactMultiple * (Math.PI / 2));
+          if (diff < 0.08) {
+            if (exactMultiple === 0) return "0";
+            if (exactMultiple === 1) return "π/2";
+            if (exactMultiple === 2) return "π";
+            if (exactMultiple === 3) return "3π/2";
+            if (exactMultiple % 2 === 0) return (exactMultiple/2) + "π";
+            return exactMultiple + "π/2";
+          }
+          return (val / Math.PI).toFixed(2) + "π";
+        };
+        ctx.fillText(tempGetTLabel(angle), textX, textY);
+      }
 
       // Highlight active components on the circle axes
       ctx.lineWidth = 3;
@@ -255,6 +308,73 @@ export default {
           ctx.lineTo(xFor(history[i].rawT), circleCenter.y - (history[i].cos - circleCenter.x));
         }
         ctx.stroke();
+      }
+
+      // Draw stamps for even pi's on the curves (0, 2pi, 4pi, 6pi, 8pi)
+      const stampedMultiples = new Set();
+      for (let i = 0; i < history.length; i++) {
+        const pt = history[i];
+        const twoPi = 2 * Math.PI;
+        const m = pt.rawT % twoPi;
+        if (m < waveSpeed * 1.5 || m > twoPi - waveSpeed * 1.5) {
+          const exactMultiple = Math.round(pt.rawT / twoPi);
+          if (stampedMultiples.has(exactMultiple)) continue;
+          stampedMultiples.add(exactMultiple);
+          
+          const label = exactMultiple === 0 ? "0" : (exactMultiple * 2) + "π";
+          const waveX = xFor(pt.rawT);
+          
+          if (showSin) {
+            ctx.fillStyle = COLOR_PINK;
+            ctx.beginPath(); ctx.arc(waveX, pt.sin, 3, 0, Math.PI * 2); ctx.fill();
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
+            ctx.font = '10px monospace';
+            ctx.textAlign = 'center';
+            ctx.fillText(label, waveX, pt.sin - 8);
+          }
+          if (showCos) {
+            ctx.fillStyle = COLOR_EMERALD;
+            const cosY = circleCenter.y - (pt.cos - circleCenter.x);
+            ctx.beginPath(); ctx.arc(waveX, cosY, 3, 0, Math.PI * 2); ctx.fill();
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
+            ctx.font = '10px monospace';
+            ctx.textAlign = 'center';
+            ctx.fillText(label, waveX, cosY - 8);
+          }
+        }
+      }
+
+      // Draw active point and coordinates on the curves
+      const getTLabel = (val) => {
+        const exactMultiple = Math.round(val / (Math.PI / 2));
+        const diff = Math.abs(val - exactMultiple * (Math.PI / 2));
+        if (diff < 0.08) {
+          if (exactMultiple === 0) return "0";
+          if (exactMultiple === 1) return "π/2";
+          if (exactMultiple === 2) return "π";
+          if (exactMultiple === 3) return "3π/2";
+          if (exactMultiple % 2 === 0) return (exactMultiple/2) + "π";
+          return exactMultiple + "π/2";
+        }
+        return (val / Math.PI).toFixed(2) + "π";
+      };
+
+      if (showSin) {
+        ctx.fillStyle = COLOR_PINK;
+        ctx.beginPath(); ctx.arc(penX, py, 4, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = COLOR_TEXT;
+        ctx.font = '11px monospace';
+        ctx.textAlign = 'left';
+        ctx.fillText(`(t: ${getTLabel(angle)}, y: ${Math.sin(angle).toFixed(2)})`, penX + 8, py - 5);
+      }
+      if (showCos) {
+        ctx.fillStyle = COLOR_EMERALD;
+        const cosY = circleCenter.y - (px - circleCenter.x);
+        ctx.beginPath(); ctx.arc(penX, cosY, 4, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = COLOR_TEXT;
+        ctx.font = '11px monospace';
+        ctx.textAlign = 'left';
+        ctx.fillText(`(t: ${getTLabel(angle)}, x: ${Math.cos(angle).toFixed(2)})`, penX + 8, cosY - 5);
       }
     }
 
@@ -352,6 +472,104 @@ export default {
       fCtx.stroke();
     }
 
+    let isDraggingDot = false;
+
+    function getMousePos(e) {
+      const rect = canvas.getBoundingClientRect();
+      const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+      const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+      return {
+        x: clientX - rect.left,
+        y: clientY - rect.top
+      };
+    }
+
+    function rebuildHistory() {
+      history.length = 0;
+      for (let tempT = 0; tempT <= t; tempT += waveSpeed) {
+        const px_temp = circleCenter.x + radius * Math.cos(tempT);
+        const py_temp = circleCenter.y - radius * Math.sin(tempT);
+        history.push({ sin: py_temp, cos: px_temp, rawT: tempT });
+      }
+    }
+
+    const handleMouseDown = (e) => {
+      if (isPlaying) return;
+      const pos = getMousePos(e);
+      const dx = pos.x - px;
+      const dy = pos.y - py;
+      const dist = Math.sqrt(dx*dx + dy*dy);
+      if (dist < 18) {
+        isDraggingDot = true;
+        e.preventDefault();
+      }
+    };
+
+    const handleMouseMove = (e) => {
+      if (!isDraggingDot) return;
+      const pos = getMousePos(e);
+      const dx = pos.x - circleCenter.x;
+      const dy = circleCenter.y - pos.y;
+      let newAngle = Math.atan2(dy, dx);
+      if (newAngle < 0) newAngle += 2 * Math.PI;
+
+      const cycle = Math.floor(t / (2 * Math.PI));
+      t = cycle * 2 * Math.PI + newAngle;
+
+      const FULL_SPAN = 8 * Math.PI;
+      if (t < 0) t = 0;
+      if (t > FULL_SPAN) t = FULL_SPAN;
+
+      rebuildHistory();
+      drawMain();
+    };
+
+    const handleMouseUp = () => {
+      isDraggingDot = false;
+    };
+
+    const handleTouchStart = (e) => {
+      if (isPlaying) return;
+      const pos = getMousePos(e);
+      const dx = pos.x - px;
+      const dy = pos.y - py;
+      const dist = Math.sqrt(dx*dx + dy*dy);
+      if (dist < 25) {
+        isDraggingDot = true;
+        e.preventDefault();
+      }
+    };
+
+    const handleTouchMove = (e) => {
+      if (!isDraggingDot) return;
+      const pos = getMousePos(e);
+      const dx = pos.x - circleCenter.x;
+      const dy = circleCenter.y - pos.y;
+      let newAngle = Math.atan2(dy, dx);
+      if (newAngle < 0) newAngle += 2 * Math.PI;
+
+      const cycle = Math.floor(t / (2 * Math.PI));
+      t = cycle * 2 * Math.PI + newAngle;
+
+      const FULL_SPAN = 8 * Math.PI;
+      if (t < 0) t = 0;
+      if (t > FULL_SPAN) t = FULL_SPAN;
+
+      rebuildHistory();
+      drawMain();
+    };
+
+    const handleTouchEnd = () => {
+      isDraggingDot = false;
+    };
+
+    canvas.addEventListener('mousedown', handleMouseDown);
+    window.addEventListener('mousemove', handleMouseMove);
+    window.addEventListener('mouseup', handleMouseUp);
+    canvas.addEventListener('touchstart', handleTouchStart, { passive: false });
+    window.addEventListener('touchmove', handleTouchMove, { passive: false });
+    window.addEventListener('touchend', handleTouchEnd);
+
     function animate() {
       drawMain();
       animationId = requestAnimationFrame(animate);
@@ -362,6 +580,13 @@ export default {
       cancelAnimationFrame(animationId);
       mainObserver.disconnect();
       if(fObserver) fObserver.disconnect();
+
+      canvas.removeEventListener('mousedown', handleMouseDown);
+      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('mouseup', handleMouseUp);
+      canvas.removeEventListener('touchstart', handleTouchStart);
+      window.removeEventListener('touchmove', handleTouchMove);
+      window.removeEventListener('touchend', handleTouchEnd);
     };
   }
 };
