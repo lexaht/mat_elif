@@ -105,6 +105,12 @@ export default {
           r(θ) = cos(4/1 · θ)
         </div>
       </div>
+      <div class="control-group">
+        <label class="control-label">Handling:</label>
+        <div class="btn-group">
+          <button class="control-btn" id="polar-play-pause"><i class="fa-solid fa-pause"></i> <span>Pause</span></button>
+        </div>
+      </div>
     `;
 
     const p1Slider = document.getElementById('p1-slider');
@@ -115,6 +121,12 @@ export default {
     const p2Label = document.getElementById('p2-label');
     const p2Container = document.getElementById('p2-container');
     const formDisplay = document.getElementById('formula-display');
+
+    const btnPlay = document.getElementById('polar-play-pause');
+    btnPlay.addEventListener('click', () => {
+      isPlaying = !isPlaying;
+      btnPlay.innerHTML = isPlaying ? '<i class="fa-solid fa-pause"></i> <span>Pause</span>' : '<i class="fa-solid fa-play"></i> <span>Start</span>';
+    });
 
     function updateUI() {
       if (shapeType === 'rose') {
@@ -265,6 +277,7 @@ export default {
     let cObserver = null;
     let isDragging = false;
     let mouseUpHandler = null;
+    let touchEndHandler = null;
     let point = { x: 50, y: -50 }; // Logical coordinates (-100 to 100)
 
     function updateConverterText() {
@@ -290,13 +303,13 @@ export default {
       cContainer.appendChild(cCanvas);
       cCtx = cCanvas.getContext('2d');
 
-      const getMousePos = (evt) => {
+      const getCanvasPos = (clientX, clientY) => {
         const rect = cCanvas.getBoundingClientRect();
         const scaleX = cCanvas.width / window.devicePixelRatio / rect.width;
         const scaleY = cCanvas.height / window.devicePixelRatio / rect.height;
         return {
-          x: (evt.clientX - rect.left) * scaleX,
-          y: (evt.clientY - rect.top) * scaleY
+          x: (clientX - rect.left) * scaleX,
+          y: (clientY - rect.top) * scaleY
         };
       };
 
@@ -314,27 +327,47 @@ export default {
         };
       };
 
-      cCanvas.addEventListener('mousedown', (e) => {
+      const startDrag = (clientX, clientY) => {
         isDragging = true;
         const w = cCanvas.width / window.devicePixelRatio;
         const h = cCanvas.height / window.devicePixelRatio;
-        const pos = getMousePos(e);
+        const pos = getCanvasPos(clientX, clientY);
         point = canvasToLogic(pos.x, pos.y, w, h);
         updateConverterText(); drawConverter();
-      });
-      cCanvas.addEventListener('mousemove', (e) => {
+      };
+      const moveDrag = (clientX, clientY) => {
         if(!isDragging) return;
         const w = cCanvas.width / window.devicePixelRatio;
         const h = cCanvas.height / window.devicePixelRatio;
-        const pos = getMousePos(e);
+        const pos = getCanvasPos(clientX, clientY);
         point = canvasToLogic(pos.x, pos.y, w, h);
         // Clamp to 100 radius logical for neatness
         const r = Math.sqrt(point.x*point.x + point.y*point.y);
         if(r > 100) { point.x = (point.x/r)*100; point.y = (point.y/r)*100; }
         updateConverterText(); drawConverter();
+      };
+
+      cCanvas.addEventListener('mousedown', (e) => {
+        startDrag(e.clientX, e.clientY);
+      });
+      cCanvas.addEventListener('mousemove', (e) => {
+        moveDrag(e.clientX, e.clientY);
       });
       mouseUpHandler = () => { isDragging = false; };
       window.addEventListener('mouseup', mouseUpHandler);
+
+      cCanvas.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        const touch = e.touches[0];
+        startDrag(touch.clientX, touch.clientY);
+      });
+      cCanvas.addEventListener('touchmove', (e) => {
+        e.preventDefault();
+        const touch = e.touches[0];
+        moveDrag(touch.clientX, touch.clientY);
+      });
+      touchEndHandler = () => { isDragging = false; };
+      window.addEventListener('touchend', touchEndHandler);
 
       cObserver = new ResizeObserver(() => {
         const rect = cContainer.getBoundingClientRect();
@@ -404,6 +437,7 @@ export default {
       mainObserver.disconnect();
       if(cObserver) cObserver.disconnect();
       if(mouseUpHandler) window.removeEventListener('mouseup', mouseUpHandler);
+      if(touchEndHandler) window.removeEventListener('touchend', touchEndHandler);
     };
   }
 };

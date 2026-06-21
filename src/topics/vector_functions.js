@@ -44,6 +44,7 @@ export default {
     const cssVar = (name, fallback) => rootStyle.getPropertyValue(name).trim() || fallback;
     const COLOR_EMERALD = cssVar('--accent-emerald', '#10b981');
     const COLOR_PINK = cssVar('--accent-pink', '#ec4899');
+    const COLOR_TEXT = cssVar('--text-primary', '#f3f4f6');
 
     const canvas = document.createElement('canvas');
     canvas.className = 'visualizer-canvas';
@@ -79,6 +80,13 @@ export default {
           <button class="control-btn" id="btn-acc">Acceleration (a)</button>
         </div>
       </div>
+      <div class="control-group">
+        <label class="control-label">Handling:</label>
+        <div class="btn-group">
+          <button class="control-btn" id="vec-play-pause"><i class="fa-solid fa-pause"></i> <span>Pause</span></button>
+          <button class="control-btn" id="vec-reset">Nulstil t</button>
+        </div>
+      </div>
     `;
 
     const fxSlider = document.getElementById('freqx-slider');
@@ -110,6 +118,18 @@ export default {
       showAcceleration = !showAcceleration;
       btnAcc.style.backgroundColor = showAcceleration ? 'var(--accent-pink)' : 'var(--bg-tertiary)';
       btnAcc.style.color = showAcceleration ? 'white' : 'var(--text-primary)';
+    });
+
+    const btnPlay = document.getElementById('vec-play-pause');
+    btnPlay.addEventListener('click', () => {
+      isPlaying = !isPlaying;
+      btnPlay.innerHTML = isPlaying ? '<i class="fa-solid fa-pause"></i> <span>Pause</span>' : '<i class="fa-solid fa-play"></i> <span>Start</span>';
+    });
+
+    const btnReset = document.getElementById('vec-reset');
+    btnReset.addEventListener('click', () => {
+      t = 0;
+      history.length = 0; // clear trail
     });
 
     let resizeObserver = new ResizeObserver(() => {
@@ -216,6 +236,13 @@ export default {
         const ay = ayFn(t) * visualAccScale;
         drawArrow(ctx, currX, currY, currX + ax, currY + ay, COLOR_PINK);
       }
+
+      // Live speed readout |v(t)| from the true (unscaled) velocity functions
+      const speed = Math.sqrt(vxFn(t) * vxFn(t) + vyFn(t) * vyFn(t)) / Math.max(scaleX, scaleY);
+      ctx.fillStyle = COLOR_TEXT;
+      ctx.font = '13px monospace';
+      ctx.textAlign = 'left';
+      ctx.fillText('Fart |v| = ' + speed.toFixed(2), currX + 12, currY - 12);
 
       if (isPlaying) {
         t += 0.015;

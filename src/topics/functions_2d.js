@@ -106,6 +106,26 @@ export default {
     });
     canvas.addEventListener('mouseleave', () => { isMouseOver = false; });
 
+    // Touch support: mirror the mouse logic so the gradient arrow works on tablets/phones
+    function updatePosFromTouch(touch) {
+      const rect = canvas.getBoundingClientRect();
+      const scaleX = canvas.width / window.devicePixelRatio / rect.width;
+      const scaleY = canvas.height / window.devicePixelRatio / rect.height;
+      mousePos = {
+        x: (touch.clientX - rect.left) * scaleX,
+        y: (touch.clientY - rect.top) * scaleY
+      };
+      isMouseOver = true;
+    }
+    canvas.addEventListener('touchstart', (e) => {
+      if (e.touches[0]) updatePosFromTouch(e.touches[0]);
+    });
+    canvas.addEventListener('touchmove', (e) => {
+      e.preventDefault(); // prevent page scroll while dragging on the map
+      if (e.touches[0]) updatePosFromTouch(e.touches[0]);
+    });
+    canvas.addEventListener('touchend', () => { isMouseOver = false; });
+
     let mainObserver = new ResizeObserver(() => {
       const rect = container.getBoundingClientRect();
       if(rect.width > 0) {
@@ -223,6 +243,17 @@ export default {
       ctx.moveTo(0, h/2); ctx.lineTo(w, h/2); // X-axis
       ctx.stroke();
 
+      // Mark the stationary point at origo for the function types where (0,0) is stationary.
+      // Paraboloide (x²+y²) has a minimum and saddle (x²-y²) has a saddle point at origo;
+      // both have ∇f(0,0)=0. The wave function does not, so we skip it.
+      if (shapeType === 'paraboloid' || shapeType === 'saddle') {
+        ctx.strokeStyle = COLOR_TEXT;
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.arc(w/2, h/2, 7, 0, Math.PI*2); // origo is at canvas center
+        ctx.stroke();
+      }
+
       // 2. Draw Interactive Gradient Vector
       if (isMouseOver) {
         const mathX = (mousePos.x / w) * 6 - 3;
@@ -271,11 +302,13 @@ export default {
 
         // Text output near cursor
         ctx.fillStyle = 'rgba(0,0,0,0.7)';
-        ctx.fillRect(mousePos.x + 15, mousePos.y + 15, 120, 45);
+        ctx.fillRect(mousePos.x + 15, mousePos.y + 15, 140, 75);
         ctx.fillStyle = '#fff';
         ctx.font = '12px monospace';
         ctx.fillText(`Z (højde): ${f(mathX, mathY).toFixed(2)}`, mousePos.x + 20, mousePos.y + 30);
-        ctx.fillText(`∇f længde: ${gradLen.toFixed(2)}`, mousePos.x + 20, mousePos.y + 45);
+        ctx.fillText(`∂f/∂x = ${grad.dx.toFixed(2)}`, mousePos.x + 20, mousePos.y + 45);
+        ctx.fillText(`∂f/∂y = ${grad.dy.toFixed(2)}`, mousePos.x + 20, mousePos.y + 60);
+        ctx.fillText(`∇f længde: ${gradLen.toFixed(2)}`, mousePos.x + 20, mousePos.y + 75);
       }
     }
 
