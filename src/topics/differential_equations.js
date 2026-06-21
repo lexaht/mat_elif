@@ -81,7 +81,7 @@ export default {
     
     // Variables
     let modelType = 'logistic'; // 'linear', 'exponential', 'logistic'
-    let k = 0.003; 
+    let k = 0.04; 
     let M = 180; // Carrying capacity (pixels) for logistic
     let y0 = 10; // initial height
     let t = 0;
@@ -100,8 +100,8 @@ export default {
         </select>
       </div>
       <div class="control-group">
-        <label class="control-label">Konstant (k): <span class="control-value" id="k-val">0.003</span></label>
-        <input type="range" class="slider-input" id="k-slider" min="0.001" max="0.010" step="0.001" value="0.003">
+        <label class="control-label">Konstant (k): <span class="control-value" id="k-val">0.040</span></label>
+        <input type="range" class="slider-input" id="k-slider" min="0.01" max="0.08" step="0.005" value="0.04">
       </div>
       <div class="control-group" id="m-container">
         <label class="control-label">Grænse / bæreevne (M): <span class="control-value" id="m-val">180</span></label>
@@ -161,7 +161,7 @@ export default {
         y0Slider.value = 10; y0 = 10;
         M = parseInt(mSlider.value);
       } else { // logistic
-        kSlider.min = 0.001; kSlider.max = 0.01; kSlider.step = 0.001; kSlider.value = 0.003; k = 0.003;
+        kSlider.min = 0.01; kSlider.max = 0.08; kSlider.step = 0.005; kSlider.value = 0.04; k = 0.04;
         y0Slider.value = 10; y0 = 10;
         M = parseInt(mSlider.value);
       }
@@ -177,11 +177,18 @@ export default {
       y0Val.textContent = y0;
       if (t === 0) resetSim();
     });
+    y0Slider.addEventListener('change', () => {
+      resetSim();
+    });
 
     kSlider.addEventListener('input', (e) => {
       k = parseFloat(e.target.value);
       kVal.textContent = k.toFixed(3);
       if (slopeCtx) drawSlopeField(); // update slope field live!
+      if (t === 0) resetSim();
+    });
+    kSlider.addEventListener('change', () => {
+      resetSim();
     });
 
     mSlider.addEventListener('input', (e) => {
@@ -189,6 +196,9 @@ export default {
       mVal.textContent = M;
       if (slopeCtx) drawSlopeField(); // update slope field live!
       if (t === 0) resetSim();
+    });
+    mSlider.addEventListener('change', () => {
+      resetSim();
     });
 
     btnPlayPause.addEventListener('click', () => {
@@ -219,9 +229,9 @@ export default {
         // Forskudt eksponentiel: y(t) = M - (M - y0)*e^(-kt), nærmer sig grænsen M.
         return M - (M - y0) * Math.exp(-k * time);
       } else if (modelType === 'logistic') {
-        // y(t) = M / (1 + C*exp(-kMt)) where C = (M-y0)/y0
+        // y(t) = M / (1 + C*exp(-kt)) where C = (M-y0)/y0
         const C = (M - y0) / y0;
-        return M / (1 + C * Math.exp(-k * M * time));
+        return M / (1 + C * Math.exp(-k * time));
       }
       return y0;
     }
@@ -231,7 +241,7 @@ export default {
       if (modelType === 'linear') return k;
       if (modelType === 'exponential') return k * y_val;
       if (modelType === 'shifted') return k * (M - y_val);
-      if (modelType === 'logistic') return k * y_val * (M - y_val);
+      if (modelType === 'logistic') return k * y_val * (1 - y_val / M);
       return 0;
     }
 
