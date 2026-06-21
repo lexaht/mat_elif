@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Matematik ELIF — Forklaret Helt Enkelt</title>
+  <!-- SEO Meta Tags -->
+  <meta name="description" content="Differentialligninger, integraler og normalfordeling forklaret som til en 5-årig for gymnasieelever. Interaktive visualiseringer og formel-toggles.">
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- KaTeX for beautiful math formulas -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  
+  <!-- FontAwesome for icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+  <div class="app-container">
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <div class="logo">
+          <i class="fa-solid fa-graduation-cap logo-icon"></i>
+          <span>mat<span class="logo-accent">_elif</span></span>
+        </div>
+        <p class="logo-sub">Matematik, helt nede på jorden</p>
+      </div>
+      
+      <nav class="topic-nav">
+        <ul>
+          <li>
+            <button class="nav-btn active" id="nav-trig" data-topic="trig">
+              <span class="nav-btn-icon"><i class="fa-solid fa-wave-square"></i></span>
+              <span class="nav-btn-text">Trigonometri</span>
+            </button>
+          </li>
+          <li>
+            <button class="nav-btn" id="nav-diff" data-topic="diff">
+              <span class="nav-btn-icon"><i class="fa-solid fa-chart-line"></i></span>
+              <span class="nav-btn-text">Differentialligninger</span>
+            </button>
+          </li>
+          <li>
+            <button class="nav-btn" id="nav-int" data-topic="int">
+              <span class="nav-btn-icon"><i class="fa-solid fa-chart-area"></i></span>
+              <span class="nav-btn-text">Integraler</span>
+            </button>
+          </li>
+          <li>
+            <button class="nav-btn" id="nav-polar" data-topic="polar">
+              <span class="nav-btn-icon"><i class="fa-solid fa-compass"></i></span>
+              <span class="nav-btn-text">Polære Koordinater</span>
+            </button>
+          </li>
+          <li>
+            <button class="nav-btn" id="nav-norm" data-topic="norm">
+              <span class="nav-btn-icon"><i class="fa-solid fa-chart-bar"></i></span>
+              <span class="nav-btn-text">Normalfordeling</span>
+            </button>
+          </li>
+        </ul>
+      </nav>
+      
+      <div class="sidebar-footer">
+        <p>Lavet til 3.g gymnasieelever</p>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+      <header class="content-header">
+        <button class="mobile-nav-toggle" id="mobile-toggle" aria-label="Toggle menu">
+          <i class="fa-solid fa-bars"></i>
+        </button>
+        <div class="theme-badge">3.g Niveau</div>
+      </header>
+
+      <section class="topic-section">
+        <!-- Topic Header -->
+        <div class="topic-header-block">
+          <h1 id="topic-title">Trigonometriske Funktioner</h1>
+          <p id="topic-subtitle" class="topic-subtitle">Hvad har bølger og cirkler med hinanden at gøre?</p>
+        </div>
+
+        <!-- ELIF Explanation Card -->
+        <article class="card elif-card">
+          <div class="card-header">
+            <span class="card-badge"><i class="fa-solid fa-baby"></i> ELIF (Som til en 5-årig)</span>
+          </div>
+          <div class="card-body" id="topic-elif-content">
+            <!-- Dynamically injected -->
+          </div>
+        </article>
+
+        <!-- Interactive Visualizer Card -->
+        <section class="card visualizer-card">
+          <div class="card-header">
+            <span class="card-badge visualizer-badge"><i class="fa-solid fa-gamepad"></i> Prøv selv</span>
+          </div>
+          <div class="card-body visualizer-body">
+            <div id="visualizer-container" class="visualizer-container">
+              <!-- Dynamically injected canvas or svg -->
+            </div>
+            <div id="visualizer-controls" class="visualizer-controls">
+              <!-- Dynamically injected controls -->
+            </div>
+          </div>
+        </section>
+
+        <!-- Formula Reveal Section -->
+        <section class="formula-section" id="formula-section">
+          <button class="formula-toggle-btn" id="formula-toggle">
+            <span class="toggle-text">Det har jeg forstået! Vis mig formlerne</span>
+            <span class="toggle-icon"><i class="fa-solid fa-chevron-down"></i></span>
+          </button>
+          <div class="formula-content-wrapper" id="formula-wrapper">
+            <div class="formula-content card">
+              <div class="card-header">
+                <span class="card-badge formula-badge"><i class="fa-solid fa-square-root-variable"></i> Matematisk Formulering</span>
+              </div>
+              <div class="card-body" id="topic-formula-content">
+                <!-- Dynamically injected -->
+              </div>
+            </div>
+          </div>
+        </section>
+      </section>
+    </main>
+  </div>
+  
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>
