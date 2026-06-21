@@ -73,15 +73,18 @@ export default {
     const pegRadius = 3;
     const ballRadius = 4;
 
-    // Peg-grid geometry (shared by setupPegs and the ball physics)
-    const ROWS = 9;
+    // Peg-grid geometry (shared by setupPegs and the ball physics).
+    // ROWS is even so the most likely outcome (equal left/right) lands dead centre,
+    // giving a single middle bar instead of a gap between two peaks.
+    const ROWS = 10;
     const SPACING_Y = 22;
     const SPACING_X = 26;
     const START_Y = 45;
 
     const balls = [];
     const pegs = [];
-    const bins = Array(15).fill(0);
+    // One bin per possible number of right-bounces (0..ROWS) => ROWS+1 bins.
+    const bins = Array(ROWS + 1).fill(0);
     let ballCounter = 0;
 
     controls.innerHTML = `
@@ -137,6 +140,7 @@ export default {
         vy: 0,
         targetX: w / 2, // where the ball is currently easing toward horizontally
         nextRow: 0,     // index of the next peg row that will flip its coin
+        rights: 0,      // number of right-bounces so far == final bin index
         color: `hsl(${220 + Math.random() * 80}, 85%, 65%)`
       });
     }
@@ -183,7 +187,9 @@ export default {
       const binTopY = h * 0.7;
       const binHeight = binBottomY - binTopY;
       const numBins = bins.length;
-      const binWidth = 24;
+      // Bin width == peg spacing so each bar sits exactly under the column of
+      // landing positions (centre + (2*rights - ROWS) * SPACING_X/2).
+      const binWidth = SPACING_X;
       const binStartX = centerX - (numBins * binWidth) / 2;
 
       ctx.strokeStyle = 'rgba(255, 255, 255, 0.05)';
@@ -223,8 +229,9 @@ export default {
         // which piles the balls up as a clean bell curve — and keeps every ball
         // inside the pyramid, so nothing can escape sideways.
         while (ball.nextRow < ROWS && ball.y >= START_Y + ball.nextRow * SPACING_Y) {
-          const dir = Math.random() < 0.5 ? -1 : 1;
-          ball.targetX += dir * (SPACING_X / 2);
+          const goRight = Math.random() < 0.5;
+          ball.targetX += (goRight ? 1 : -1) * (SPACING_X / 2);
+          if (goRight) ball.rights++;
           ball.nextRow++;
         }
         // Ease horizontally toward the current target so the motion looks like the
@@ -232,12 +239,13 @@ export default {
         ball.x += (ball.targetX - ball.x) * 0.25;
 
         if (ball.y >= binTopY) {
-          let binIndex = Math.floor((ball.x - binStartX) / binWidth);
-          // Clamp to valid bins so balls never disappear
+          // Bin by the exact number of right-bounces — no pixel rounding, so the
+          // centre bin is always reachable and there is never a phantom gap.
+          let binIndex = ball.rights;
           if (binIndex < 0) binIndex = 0;
           if (binIndex >= numBins) binIndex = numBins - 1;
-          
-          bins[binIndex]++; 
+
+          bins[binIndex]++;
           ballCounter++; 
           document.getElementById('ball-count').textContent = ballCounter;
           

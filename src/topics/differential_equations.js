@@ -12,6 +12,13 @@ export default {
     </div>
 
     <div class="analogy-box">
+      <div class="analogy-title">Kaffekop-analogien (Forskudt eksponentiel)</div>
+      <p class="analogy-text">
+        En rygende varm kop kaffe køler ned mod stuetemperaturen. Når den er meget varm, køler den hurtigt (stor forskel til rummet). Jo tættere den kommer på stuetemperaturen, jo langsommere går det – og den når faktisk aldrig HELT derned. Her afhænger ændringshastigheden af, hvor langt der er <em>tilbage til grænsen</em>.
+      </p>
+    </div>
+
+    <div class="analogy-box">
       <div class="analogy-title">Bakterie-analogien (Logistisk)</div>
       <p class="analogy-text">
         Tænk på bakterier, der vokser i en skål. I starten er der masser af mad, så de formerer sig ekstremt hurtigt. Men når skålen begynder at blive fuld, slipper maden op, og væksten bremser op og stopper helt. Deres ændringshastighed afhænger af, hvor mange der er, <em>og</em> hvor meget plads der er tilbage!
@@ -25,7 +32,7 @@ export default {
     
     <p>En <strong>differentialkvotient</strong> <span data-math="y'" data-display="inline"></span> (eller <span data-math="\\frac{dy}{dt}" data-display="inline"></span>) beskriver hældningen af en tangent til en funktion – altså funktionens øjeblikkelige væksthastighed.</p>
     
-    <p>En <strong>1. ordens differentialligning</strong> er en ligning, der indeholder den første afledte <span data-math="y'" data-display="inline"></span> og selve funktionen <span data-math="y" data-display="inline"></span>. Her er tre klassiske modeller fra gymnasiet:</p>
+    <p>En <strong>1. ordens differentialligning</strong> er en ligning, der indeholder den første afledte <span data-math="y'" data-display="inline"></span> og selve funktionen <span data-math="y" data-display="inline"></span>. Her er fire klassiske modeller fra gymnasiet:</p>
     
     <ul class="formula-desc-list">
       <li>
@@ -39,7 +46,12 @@ export default {
         Løsningen er en eksponentialfunktion: <span data-math="y(t) = c \\cdot e^{kt}" data-display="inline"></span>. <span data-math="k>0" data-display="inline"></span> giver vækst, <span data-math="k<0" data-display="inline"></span> giver henfald.
       </li>
       <li style="margin-top:10px;">
-        <strong>Logistisk vækst:</strong> 
+        <strong>Forskudt eksponentiel vækst (begrænset vækst):</strong>
+        <span data-math="y' = k \\cdot (M - y)" data-display="inline"></span>.
+        Væksthastigheden afhænger af <em>afstanden</em> til en grænse <span data-math="M" data-display="inline"></span>: langt fra grænsen vokser den hurtigt, tæt på går den næsten i stå. Løsningen er <span data-math="y(t) = M - (M - y_0)\\cdot e^{-kt}" data-display="inline"></span>. Kurven nærmer sig <span data-math="M" data-display="inline"></span>, men rammer den aldrig – og i modsætning til den logistiske har den intet vendepunkt (ingen langsom start). Det er fx Newtons afkølingslov.
+      </li>
+      <li style="margin-top:10px;">
+        <strong>Logistisk vækst:</strong>
         <span data-math="y' = k \\cdot y \\cdot (M - y)" data-display="inline"></span>. 
         Her er <span data-math="M" data-display="inline"></span> den maksimale bæreevne (plads i petriskålen). Løsningen danner en S-kurve, hvor væksten stopper, når <span data-math="y = M" data-display="inline"></span>. Løsningen er <span data-math="y(t) = \\frac{M}{1 + c\\cdot e^{-kMt}}" data-display="inline"></span>, hvor c bestemmes af startværdien. Grafen er en S-kurve der starter eksponentielt og flader ud mod M.
       </li>
@@ -81,14 +93,19 @@ export default {
       <div class="control-group">
         <label class="control-label">Vækstmodel:</label>
         <select id="model-select" style="padding:8px; border-radius:4px; background:var(--bg-tertiary); color:white; border:1px solid var(--border-color); font-family:var(--font-sans);">
-          <option value="logistic">Logistisk (S-kurve / Bakterier)</option>
-          <option value="exponential">Eksponentiel Henfald (Vandspand)</option>
           <option value="linear">Lineær (Konstant fart)</option>
+          <option value="exponential">Eksponentiel (Vandspand / vækst)</option>
+          <option value="shifted">Forskudt eksponentiel (Begrænset / kaffekop)</option>
+          <option value="logistic" selected>Logistisk (S-kurve / Bakterier)</option>
         </select>
       </div>
       <div class="control-group">
         <label class="control-label">Konstant (k): <span class="control-value" id="k-val">0.003</span></label>
         <input type="range" class="slider-input" id="k-slider" min="0.001" max="0.010" step="0.001" value="0.003">
+      </div>
+      <div class="control-group" id="m-container">
+        <label class="control-label">Grænse / bæreevne (M): <span class="control-value" id="m-val">180</span></label>
+        <input type="range" class="slider-input" id="m-slider" min="60" max="190" step="10" value="180">
       </div>
       <div class="control-group">
         <label class="control-label">Startværdi (y₀): <span class="control-value" id="y0-val">10</span></label>
@@ -107,6 +124,9 @@ export default {
     const y0Val = document.getElementById('y0-val');
     const kSlider = document.getElementById('k-slider');
     const kVal = document.getElementById('k-val');
+    const mSlider = document.getElementById('m-slider');
+    const mVal = document.getElementById('m-val');
+    const mContainer = document.getElementById('m-container');
     const modelSelect = document.getElementById('model-select');
     const btnPlayPause = document.getElementById('btn-play-pause');
     const btnReset = document.getElementById('btn-reset');
@@ -114,28 +134,43 @@ export default {
     function resetSim() {
       t = 0;
       history.length = 0;
-      if (!isPlaying) {
-        draw();
-        if (slopeCtx) drawSlopeField();
-      }
+      // Restart playback so the curve redraws from the start (it may have paused
+      // itself after reaching the right edge).
+      isPlaying = true;
+      btnPlayPause.innerHTML = '<i class="fa-solid fa-pause"></i> <span>Pause</span>';
+      if (slopeCtx) drawSlopeField();
+    }
+
+    // Show the M slider only for the models that actually use a limit/carrying capacity.
+    function updateModelControls() {
+      const usesM = (modelType === 'logistic' || modelType === 'shifted');
+      mContainer.style.display = usesM ? 'flex' : 'none';
     }
 
     modelSelect.addEventListener('change', (e) => {
       modelType = e.target.value;
       if (modelType === 'linear') {
-        kSlider.max = 0.5; kSlider.value = 0.2; k = 0.2;
+        kSlider.min = 0.05; kSlider.max = 0.5; kSlider.step = 0.01; kSlider.value = 0.2; k = 0.2;
         y0Slider.value = 10; y0 = 10;
       } else if (modelType === 'exponential') {
-        kSlider.max = 0.02; kSlider.value = 0.005; k = 0.005;
+        // Signed k: negative = henfald (vandspand), positive = vækst
+        kSlider.min = -0.02; kSlider.max = 0.02; kSlider.step = 0.001; kSlider.value = -0.005; k = -0.005;
         y0Slider.value = 150; y0 = 150;
-      } else {
-        kSlider.max = 0.01; kSlider.value = 0.003; k = 0.003;
+      } else if (modelType === 'shifted') {
+        kSlider.min = 0.002; kSlider.max = 0.03; kSlider.step = 0.001; kSlider.value = 0.01; k = 0.01;
         y0Slider.value = 10; y0 = 10;
+        M = parseInt(mSlider.value);
+      } else { // logistic
+        kSlider.min = 0.001; kSlider.max = 0.01; kSlider.step = 0.001; kSlider.value = 0.003; k = 0.003;
+        y0Slider.value = 10; y0 = 10;
+        M = parseInt(mSlider.value);
       }
-      kVal.textContent = k;
+      kVal.textContent = k.toFixed(3);
       y0Val.textContent = y0;
+      updateModelControls();
       resetSim();
     });
+    updateModelControls();
 
     y0Slider.addEventListener('input', (e) => {
       y0 = parseInt(e.target.value);
@@ -147,6 +182,13 @@ export default {
       k = parseFloat(e.target.value);
       kVal.textContent = k.toFixed(3);
       if (slopeCtx) drawSlopeField(); // update slope field live!
+    });
+
+    mSlider.addEventListener('input', (e) => {
+      M = parseInt(e.target.value);
+      mVal.textContent = M;
+      if (slopeCtx) drawSlopeField(); // update slope field live!
+      if (t === 0) resetSim();
     });
 
     btnPlayPause.addEventListener('click', () => {
@@ -171,7 +213,11 @@ export default {
       if (modelType === 'linear') {
         return y0 + k * time;
       } else if (modelType === 'exponential') {
-        return y0 * Math.exp(-k * time);
+        // Signed k: y = y0*e^(kt). k<0 henfald, k>0 vækst.
+        return y0 * Math.exp(k * time);
+      } else if (modelType === 'shifted') {
+        // Forskudt eksponentiel: y(t) = M - (M - y0)*e^(-kt), nærmer sig grænsen M.
+        return M - (M - y0) * Math.exp(-k * time);
       } else if (modelType === 'logistic') {
         // y(t) = M / (1 + C*exp(-kMt)) where C = (M-y0)/y0
         const C = (M - y0) / y0;
@@ -183,7 +229,8 @@ export default {
     // Derivative function for the slope field y'(t, y)
     function getDerivative(y_val) {
       if (modelType === 'linear') return k;
-      if (modelType === 'exponential') return -k * y_val;
+      if (modelType === 'exponential') return k * y_val;
+      if (modelType === 'shifted') return k * (M - y_val);
       if (modelType === 'logistic') return k * y_val * (M - y_val);
       return 0;
     }
@@ -216,8 +263,8 @@ export default {
       ctx.fillText('y(t)', graphLeft - 30, graphTop + 10);
       ctx.fillText('t', graphLeft + graphWidth + 10, graphBottom + 4);
 
-      if (modelType === 'logistic') {
-        // Draw carrying capacity line M
+      if (modelType === 'logistic' || modelType === 'shifted') {
+        // Draw carrying capacity / limit line M
         ctx.strokeStyle = 'rgba(236, 72, 153, 0.5)';
         ctx.setLineDash([5, 5]);
         ctx.beginPath();
@@ -345,7 +392,7 @@ export default {
           slopeCtx.strokeStyle = 'rgba(165, 180, 252, 0.6)'; // text-accent
           
           // Highlight regions depending on model
-          if (modelType === 'logistic' && Math.abs(mathY - M) < 5) {
+          if ((modelType === 'logistic' || modelType === 'shifted') && Math.abs(mathY - M) < 5) {
              slopeCtx.strokeStyle = COLOR_PINK;
           }
 
