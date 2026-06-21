@@ -32,7 +32,7 @@ export default {
     
     <p style="margin-top: 20px;"><strong>Tangent til banekurven:</strong></p>
     <p>Tangenten til banekurven i punktet svarende til <span data-math="t_0" data-display="inline"></span> har hastighedsvektoren som retningsvektor:</p>
-    <div data-math="\\begin{pmatrix} x \\\\ y \\end{pmatrix} = \\vec{r}(t_0) + s \\cdot \\vec{r}\\,'(t_0)"></div>
+    <div data-math="\\begin{pmatrix} x \\\\ y \\end{pmatrix} = \\vec{r}(t_0) + s \\cdot \\vec{r}'(t_0)"></div>
 
     <p style="margin-top: 20px;"><strong>Accelerationsvektor:</strong></p>
     <p>Differentierer vi hastigheden, får vi <strong>accelerationsvektoren</strong>. Den fortæller hvordan hastigheden ændrer sig — både hvis farten øges/bremses, og hvis retningen drejer. Når farten er konstant og banen krummer, peger accelerationen vinkelret ind mod kurvens indre (centripetalt, som ind mod midten af et sving).</p>

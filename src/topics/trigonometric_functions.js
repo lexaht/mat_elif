@@ -137,16 +137,23 @@ export default {
       const circleCenter = { x: w * 0.25, y: h / 2 };
       const radius = Math.min(w, h) * 0.3;
       const waveStart = w * 0.5;
+      const waveWidth = w - waveStart - 15;
+      // The wave is plotted left -> right as the angle runs from 0 to 4π, then
+      // wipes and starts over (oscilloscope style), so the curve stays put on
+      // screen instead of scrolling away.
+      const FULL_SPAN = 4 * Math.PI;
+      const xFor = (rawT) => waveStart + (Math.max(0, Math.min(rawT, FULL_SPAN)) / FULL_SPAN) * waveWidth;
 
       const angle = t;
       const px = circleCenter.x + radius * Math.cos(angle);
       const py = circleCenter.y - radius * Math.sin(angle); // negative y because canvas y is down
+      const penX = xFor(angle); // where the "pen" is currently drawing
 
       if (isPlaying) {
-        // store both sin and cos components
-        history.unshift({ sin: py, cos: px, rawT: t });
-        if (history.length > maxHistory) history.pop();
+        // store both sin and cos components, oldest first
+        history.push({ sin: py, cos: px, rawT: t });
         t += waveSpeed;
+        if (t >= FULL_SPAN) { t = 0; history.length = 0; } // wipe and restart the sweep
       }
 
       // Draw circle
@@ -172,20 +179,20 @@ export default {
         ctx.strokeStyle = COLOR_PINK;
         ctx.beginPath(); ctx.moveTo(px, circleCenter.y); ctx.lineTo(px, py); ctx.stroke();
         
-        // Dotted line to wave
+        // Dotted line from the circle to the pen drawing the wave
         ctx.strokeStyle = 'rgba(236, 72, 153, 0.4)';
         ctx.setLineDash([4, 4]);
-        ctx.beginPath(); ctx.moveTo(px, py); ctx.lineTo(waveStart, py); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(px, py); ctx.lineTo(penX, py); ctx.stroke();
         ctx.setLineDash([]);
       }
       if (showCos) {
         ctx.strokeStyle = COLOR_EMERALD;
         ctx.beginPath(); ctx.moveTo(circleCenter.x, py); ctx.lineTo(px, py); ctx.stroke();
         
-        // Dotted line to wave
+        // Dotted line from the circle to the pen drawing the wave
         ctx.strokeStyle = 'rgba(16, 185, 129, 0.4)';
         ctx.setLineDash([4, 4]);
-        ctx.beginPath(); ctx.moveTo(px, py); ctx.lineTo(waveStart, circleCenter.y - (px - circleCenter.x)); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(px, py); ctx.lineTo(penX, circleCenter.y - (px - circleCenter.x)); ctx.stroke();
         ctx.setLineDash([]);
       }
 
@@ -214,7 +221,7 @@ export default {
           const exactMultiple = Math.round(pt.rawT / (Math.PI / 2));
           if (i > 0 && Math.round(history[i-1].rawT / (Math.PI/2)) === exactMultiple) continue; // avoid duplicates
 
-          const waveX = waveStart + i * 2;
+          const waveX = xFor(pt.rawT);
           ctx.fillRect(waveX, circleCenter.y - 4, 1, 8);
           
           let label = "";
@@ -229,23 +236,23 @@ export default {
         }
       }
 
-      // Draw wave history
+      // Draw wave history (plotted left -> right by angle)
       ctx.lineWidth = 3;
-      if (showSin && history.length > 0) {
+      if (showSin && history.length > 1) {
         ctx.strokeStyle = COLOR_PINK;
         ctx.beginPath();
-        ctx.moveTo(waveStart, history[0].sin);
+        ctx.moveTo(xFor(history[0].rawT), history[0].sin);
         for (let i = 1; i < history.length; i++) {
-          ctx.lineTo(waveStart + i * 2, history[i].sin);
+          ctx.lineTo(xFor(history[i].rawT), history[i].sin);
         }
         ctx.stroke();
       }
-      if (showCos && history.length > 0) {
+      if (showCos && history.length > 1) {
         ctx.strokeStyle = COLOR_EMERALD;
         ctx.beginPath();
-        ctx.moveTo(waveStart, circleCenter.y - (history[0].cos - circleCenter.x));
+        ctx.moveTo(xFor(history[0].rawT), circleCenter.y - (history[0].cos - circleCenter.x));
         for (let i = 1; i < history.length; i++) {
-          ctx.lineTo(waveStart + i * 2, circleCenter.y - (history[i].cos - circleCenter.x));
+          ctx.lineTo(xFor(history[i].rawT), circleCenter.y - (history[i].cos - circleCenter.x));
         }
         ctx.stroke();
       }
