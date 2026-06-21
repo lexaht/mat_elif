@@ -45,6 +45,13 @@ export default {
     </div>
   `,
   initVisualizer: (container, controls, formulaContainer) => {
+    // Canvas understands real color strings, not CSS var(--...). Resolve them once.
+    const rootStyle = getComputedStyle(document.documentElement);
+    const cssVar = (name, fallback) => rootStyle.getPropertyValue(name).trim() || fallback;
+    const COLOR_INDIGO = cssVar('--accent-indigo', '#6366f1');
+    const COLOR_PURPLE = cssVar('--accent-purple', '#8b5cf6');
+    const COLOR_PINK = cssVar('--accent-pink', '#ec4899');
+
     // 1. GALTON BOARD VISUALIZER
     const canvas = document.createElement('canvas');
     canvas.className = 'visualizer-canvas';
@@ -56,10 +63,16 @@ export default {
     let spawnRate = 4;
     let dropInterval = null;
     
-    const gravity = 0.15;
-    const bounceLoss = 0.3;
+    const gravity = 0.18;
+    const maxFallSpeed = 4;
     const pegRadius = 3;
     const ballRadius = 4;
+
+    // Peg-grid geometry (shared by setupPegs and the ball physics)
+    const ROWS = 9;
+    const SPACING_Y = 22;
+    const SPACING_X = 26;
+    const START_Y = 45;
 
     const balls = [];
     const pegs = [];
@@ -114,8 +127,11 @@ export default {
       const w = canvas.width / window.devicePixelRatio || container.clientWidth;
       if (w === 0) return;
       balls.push({
-        x: w / 2 + (Math.random() - 0.5) * 2,
-        y: 15, vx: 0, vy: 0,
+        x: w / 2,
+        y: 15,
+        vy: 0,
+        targetX: w / 2, // where the ball is currently easing toward horizontally
+        nextRow: 0,     // index of the next peg row that will flip its coin
         color: `hsl(${220 + Math.random() * 80}, 85%, 65%)`
       });
     }
@@ -130,15 +146,11 @@ export default {
     function setupPegs(w, h) {
       pegs.length = 0;
       const centerX = w / 2;
-      const rows = 9;
-      const spacingY = 22;
-      const spacingX = 26;
-      const startY = 45;
-      for (let r = 0; r < rows; r++) {
-        const y = startY + r * spacingY;
+      for (let r = 0; r < ROWS; r++) {
+        const y = START_Y + r * SPACING_Y;
         const count = r + 1;
-        const startX = centerX - ((count - 1) * spacingX) / 2;
-        for (let c = 0; c < count; c++) pegs.push({ x: startX + c * spacingX, y: y });
+        const startX = centerX - ((count - 1) * SPACING_X) / 2;
+        for (let c = 0; c < count; c++) pegs.push({ x: startX + c * SPACING_X, y: y });
       }
     }
 
@@ -183,7 +195,7 @@ export default {
           const bx = binStartX + i * binWidth;
           const barHeight = Math.min((count / maxInBin) * binHeight, binHeight);
           const grad = ctx.createLinearGradient(bx, binBottomY, bx, binBottomY - barHeight);
-          grad.addColorStop(0, 'var(--accent-indigo)'); grad.addColorStop(1, 'var(--accent-purple)');
+          grad.addColorStop(0, COLOR_INDIGO); grad.addColorStop(1, COLOR_PURPLE);
           ctx.fillStyle = grad;
           ctx.fillRect(bx + 2, binBottomY - barHeight, binWidth - 4, barHeight);
         }
@@ -196,34 +208,23 @@ export default {
 
       for (let i = balls.length - 1; i >= 0; i--) {
         const ball = balls[i];
-        ball.vy += gravity; 
-        ball.x += ball.vx; 
+
+        // Fall under gravity (capped so we never tunnel through a peg row).
+        ball.vy = Math.min(ball.vy + gravity, maxFallSpeed);
         ball.y += ball.vy;
 
-        pegs.forEach(peg => {
-          const dx = ball.x - peg.x; const dy = ball.y - peg.y;
-          const dist = Math.sqrt(dx*dx + dy*dy);
-          const minDist = ballRadius + pegRadius;
-          if (dist < minDist) {
-            const overlap = minDist - dist; const nx = dx/dist; const ny = dy/dist;
-            ball.x += nx * overlap; ball.y += ny * overlap;
-            const dot = ball.vx*nx + ball.vy*ny;
-            ball.vx = (ball.vx - 2*dot*nx) * bounceLoss + (Math.random() - 0.5) * 0.2; // reduced random jitter
-            ball.vy = (ball.vy - 2*dot*ny) * bounceLoss + 0.1;
-          }
-        });
-
-        // Add funnel walls so balls cannot escape the pyramid horizontally
-        // The pyramid width grows as it goes down. 
-        const py = Math.max(0, ball.y - 45); // 45 is startY
-        const maxDistFromCenter = 26 + (py / 22) * 13; // rough funnel based on rows (spacingY=22, spacingX=26/2)
-        if (ball.x < centerX - maxDistFromCenter) {
-           ball.x = centerX - maxDistFromCenter;
-           ball.vx = Math.abs(ball.vx) * bounceLoss + 0.5; // bounce right
-        } else if (ball.x > centerX + maxDistFromCenter) {
-           ball.x = centerX + maxDistFromCenter;
-           ball.vx = -Math.abs(ball.vx) * bounceLoss - 0.5; // bounce left
+        // Each peg row the ball reaches is one fair coin flip: nudge the target
+        // half a peg-spacing left or right. Summed over all rows this is a binomial,
+        // which piles the balls up as a clean bell curve — and keeps every ball
+        // inside the pyramid, so nothing can escape sideways.
+        while (ball.nextRow < ROWS && ball.y >= START_Y + ball.nextRow * SPACING_Y) {
+          const dir = Math.random() < 0.5 ? -1 : 1;
+          ball.targetX += dir * (SPACING_X / 2);
+          ball.nextRow++;
         }
+        // Ease horizontally toward the current target so the motion looks like the
+        // ball weaving through the gaps rather than teleporting.
+        ball.x += (ball.targetX - ball.x) * 0.25;
 
         if (ball.y >= binTopY) {
           let binIndex = Math.floor((ball.x - binStartX) / binWidth);
@@ -352,7 +353,7 @@ export default {
       }
       
       // Boundaries
-      zCtx.strokeStyle = 'var(--accent-pink)';
+      zCtx.strokeStyle = COLOR_PINK;
       zCtx.setLineDash([4,4]);
       zCtx.beginPath();
       zCtx.moveTo(centerX - zValue * scaleX, bottomY);
@@ -364,7 +365,8 @@ export default {
     }
 
     function animate() {
-      draw();
+      // Keep the loop alive even if a single frame throws, so the board never freezes.
+      try { draw(); } catch (err) { console.error('Galton draw error:', err); }
       animationId = requestAnimationFrame(animate);
     }
     animate();
