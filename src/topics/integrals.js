@@ -10,7 +10,7 @@ export default {
         Men hvad nu hvis farten ændrer sig hele tiden (du gasser op, bremser ned)? Så kan du finde den samlede kørte afstand ved at dele hele turen op i bittesmå stykker på ét sekund. I hvert sekund kører du med næsten konstant fart. Lægger du alle disse små "sekund-afstande" sammen, får du den totale afstand.
       </p>
       <p class="analogy-text" style="margin-top: 8px;">
-        Her er hemmeligheden: Hvis din graf viser <strong>farten</strong>, så er <strong>stamfunktionen</strong> simpelthen bilens kilometertæller! Stamfunktionen holder styr på det <em>opsamlede resultat</em> (det samlede areal under fart-grafen). At finde stamfunktionen er præcis det omvendte af at finde ændringshastigheden (differentialkvotienten).
+        Her er hemmeligheden: Arealet under fart-grafen ER den tilbagelagte afstand — og afstanden kan du aflæse direkte på kilometertælleren! Kilometertælleren er nemlig stamfunktionen: mens speedometeret (farten) springer op og ned, lægger kilometertælleren stille og roligt det hele sammen. At finde stamfunktionen er præcis det omvendte af at finde ændringshastigheden (differentialkvotienten).
       </p>
     </div>
 
@@ -21,9 +21,11 @@ export default {
     
     <p>Arealet under en funktion <span data-math="f(x)" data-display="inline"></span> fra <span data-math="a" data-display="inline"></span> til <span data-math="b" data-display="inline"></span> skrives som:</p>
     <div data-math="\\int_{a}^{b} f(x) \\, dx = \\lim_{n \\to \\infty} \\sum_{i=1}^{n} f(x_i) \\cdot \\Delta x"></div>
+    <p>Her er <span data-math='x_i' data-display='inline'></span> et valgt punkt i hvert delinterval, og <span data-math='\\Delta x = \\frac{b-a}{n}' data-display='inline'></span> er bredden. Når <span data-math='n \\to \\infty' data-display='inline'></span> går venstre-, højre- og midtpunktssum alle mod samme værdi.</p>
 
     <p style="margin-top: 20px;"><strong>Stamfunktionen (F(x)):</strong></p>
     <p>En stamfunktion <span data-math="F(x)" data-display="inline"></span> til en funktion <span data-math="f(x)" data-display="inline"></span> er defineret ved, at hvis man differentierer <span data-math="F" data-display="inline"></span>, får man <span data-math="f" data-display="inline"></span> tilbage: <span data-math="F'(x) = f(x)" data-display="inline"></span>.</p>
+    <p>Stamfunktionen er ikke entydig: er <span data-math='F(x)' data-display='inline'></span> en stamfunktion, er <span data-math='F(x)+k' data-display='inline'></span> det også. Det skrives <span data-math='\\int f(x)\\,dx = F(x)+k' data-display='inline'></span> (det ubestemte integral).</p>
     <p>Takket være Infinitesimalregningens Fundamentalsætning, kan vi udregne arealet meget nemt, hvis vi kender stamfunktionen:</p>
     <div data-math="\\int_{a}^{b} f(x) \\, dx = [F(x)]_{a}^{b} = F(b) - F(a)"></div>
 
@@ -32,15 +34,20 @@ export default {
       <p style="font-size: 14px; margin-bottom: 15px; color: var(--text-secondary);">Hvordan rektanglerne placeres (venstrekant, højrekant eller midtpunkt) afgør, om vi overvurderer eller undervurderer arealet, før vi tager grænseværdien. Prøv at skifte type:</p>
       
       <div class="btn-group" style="margin-bottom: 15px;">
-        <button class="control-btn sum-btn" data-type="under" style="background-color:var(--bg-tertiary); color:var(--text-primary);">Undersum (Venstre)</button>
+        <button class="control-btn sum-btn" data-type="under" style="background-color:var(--bg-tertiary); color:var(--text-primary);">Venstresum</button>
         <button class="control-btn sum-btn" data-type="mid" style="background-color:var(--accent-emerald); color:white;">Midtpunkt</button>
-        <button class="control-btn sum-btn" data-type="over" style="background-color:var(--bg-tertiary); color:var(--text-primary);">Oversum (Højre)</button>
+        <button class="control-btn sum-btn" data-type="over" style="background-color:var(--bg-tertiary); color:var(--text-primary);">Højresum</button>
       </div>
 
       <div id="riemann-container" style="width: 100%; height: 250px; background: var(--bg-primary); border-radius: var(--radius-md); border: 1px solid var(--border-color); overflow: hidden;"></div>
     </div>
   `,
   initVisualizer: (container, controls, formulaContainer) => {
+    // Canvas understands real color strings, not CSS var(--...). Resolve them once.
+    const rootStyle = getComputedStyle(document.documentElement);
+    const cssVar = (n, fb) => rootStyle.getPropertyValue(n).trim() || fb;
+    const COLOR_EMERALD = cssVar('--accent-emerald', '#10b981');
+
     // 1. MAIN VISUALIZER
     const canvas = document.createElement('canvas');
     canvas.className = 'visualizer-canvas';
@@ -140,7 +147,7 @@ export default {
       // Rectangles (Midpoint)
       const rectWidth = (bValue - aValue) / numRects;
       let riemannSum = 0;
-      ctx.strokeStyle = 'var(--accent-emerald)';
+      ctx.strokeStyle = COLOR_EMERALD;
       ctx.lineWidth = 1;
       
       for (let i = 0; i < numRects; i++) {
@@ -233,7 +240,7 @@ export default {
       const locB = w - 50;
       const rectWidth = (locB - locA) / numRects;
       
-      slopeCtx.strokeStyle = 'var(--accent-emerald)';
+      slopeCtx.strokeStyle = COLOR_EMERALD;
       slopeCtx.fillStyle = 'rgba(16, 185, 129, 0.4)';
       
       for (let i = 0; i < numRects; i++) {

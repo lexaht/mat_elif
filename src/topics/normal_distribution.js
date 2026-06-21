@@ -17,7 +17,7 @@ export default {
       </p>
     </div>
 
-    <p>Når mange uafhængige, tilfældige begivenheder (som genetik, kost og miljø) lægges sammen, vil resultatet næsten altid fordele sig i en smuk "klokkeform", der er høj i midten og flader ud til siderne. Dette fænomen kaldes Den Centrale Grænseværdisætning.</p>
+    <p>Når mange uafhængige, tilfældige begivenheder (som genetik, kost og miljø) lægges sammen, vil resultatet næsten altid fordele sig i en smuk "klokkeform", der er høj i midten og flader ud til siderne. At det gælder næsten uanset hvad de enkelte bidrag er, kalder matematikerne Den Centrale Grænseværdisætning.</p>
   `,
   formula: `
     <div class="formula-card-sub">Sandsynlighedstæthedsfunktionen for en normalfordelt variabel X ~ N(μ, σ²).</div>
@@ -42,6 +42,11 @@ export default {
       <div id="zcurve-container" style="width: 100%; height: 250px; background: var(--bg-primary); border-radius: var(--radius-md); border: 1px solid var(--border-color); overflow: hidden; position: relative;">
         <div id="z-area-text" style="position: absolute; top: 20px; left: 20px; color: white; font-weight: bold; font-size: 18px;">Areal: 68.3%</div>
       </div>
+
+      <p style="margin-top: 15px;">Tommelfingerreglen i tal: ca. <strong>68 %</strong> ligger inden for <span data-math="\\mu \\pm 1\\sigma" data-display="inline"></span>, ca. <strong>95 %</strong> inden for <span data-math="\\mu \\pm 2\\sigma" data-display="inline"></span>, og ca. <strong>99,7 %</strong> inden for <span data-math="\\mu \\pm 3\\sigma" data-display="inline"></span>.</p>
+
+      <p style="margin-top: 15px;">Enhver normalfordelt værdi kan omregnes til en standardiseret z-værdi, der tæller hvor mange standardafvigelser man er fra middelværdien:</p>
+      <div data-math="z = \\frac{x - \\mu}{\\sigma}"></div>
     </div>
   `,
   initVisualizer: (container, controls, formulaContainer) => {

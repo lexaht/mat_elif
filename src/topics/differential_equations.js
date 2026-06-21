@@ -36,12 +36,12 @@ export default {
       <li style="margin-top:10px;">
         <strong>Eksponentiel vækst/henfald:</strong> 
         <span data-math="y' = k \\cdot y" data-display="inline"></span>. 
-        Løsningen er en eksponentialfunktion: <span data-math="y(t) = c \\cdot e^{kt}" data-display="inline"></span>.
+        Løsningen er en eksponentialfunktion: <span data-math="y(t) = c \\cdot e^{kt}" data-display="inline"></span>. <span data-math="k>0" data-display="inline"></span> giver vækst, <span data-math="k<0" data-display="inline"></span> giver henfald.
       </li>
       <li style="margin-top:10px;">
         <strong>Logistisk vækst:</strong> 
         <span data-math="y' = k \\cdot y \\cdot (M - y)" data-display="inline"></span>. 
-        Her er <span data-math="M" data-display="inline"></span> den maksimale bæreevne (plads i petriskålen). Løsningen danner en S-kurve, hvor væksten stopper, når <span data-math="y = M" data-display="inline"></span>.
+        Her er <span data-math="M" data-display="inline"></span> den maksimale bæreevne (plads i petriskålen). Løsningen danner en S-kurve, hvor væksten stopper, når <span data-math="y = M" data-display="inline"></span>. Løsningen er <span data-math="y(t) = \\frac{M}{1 + c\\cdot e^{-kMt}}" data-display="inline"></span>, hvor c bestemmes af startværdien. Grafen er en S-kurve der starter eksponentielt og flader ud mod M.
       </li>
     </ul>
 
@@ -52,6 +52,12 @@ export default {
     </div>
   `,
   initVisualizer: (container, controls, formulaContainer) => {
+    // Canvas understands real color strings, not CSS var(--...). Resolve them once.
+    const rootStyle = getComputedStyle(document.documentElement);
+    const cssVar = (name, fallback) => rootStyle.getPropertyValue(name).trim() || fallback;
+    const COLOR_PINK = cssVar('--accent-pink', '#ec4899');
+    const COLOR_EMERALD = cssVar('--accent-emerald', '#10b981');
+
     // 1. MAIN VISUALIZER (Graph)
     const canvas = document.createElement('canvas');
     canvas.className = 'visualizer-canvas';
@@ -171,6 +177,7 @@ export default {
         const C = (M - y0) / y0;
         return M / (1 + C * Math.exp(-k * M * time));
       }
+      return y0;
     }
 
     // Derivative function for the slope field y'(t, y)
@@ -219,25 +226,27 @@ export default {
         ctx.lineTo(graphLeft + graphWidth, my);
         ctx.stroke();
         ctx.setLineDash([]);
-        ctx.fillStyle = 'var(--accent-pink)';
+        ctx.fillStyle = COLOR_PINK;
         ctx.fillText('Max (M)', graphLeft - 45, my + 4);
       }
 
       const currentY = getY(t);
 
       if (isPlaying) {
-        history.push({ t: t, val: currentY });
-        if (history.length > maxHistory) {
-          // Instead of shifting, we reset time if it goes off screen for continuous demo
-          t = 0; history.length = 0;
+        if (history.length >= maxHistory) {
+          // Reached the right edge: stop neatly instead of wiping the curve.
+          // The Nulstil button resets history/t so the demo can start over.
+          isPlaying = false;
+          btnPlayPause.innerHTML = '<i class="fa-solid fa-play"></i> <span>Start</span>';
         } else {
+          history.push({ t: t, val: currentY });
           t += 0.8;
         }
       }
 
       // Plot history line
       if (history.length > 0) {
-        ctx.strokeStyle = 'var(--accent-emerald)';
+        ctx.strokeStyle = COLOR_EMERALD;
         ctx.lineWidth = 3;
         ctx.beginPath();
         history.forEach((pt, i) => {
@@ -253,7 +262,7 @@ export default {
         const dotX = graphLeft + (lastPt.t / (maxHistory*0.8)) * graphWidth;
         const dotY = graphBottom - (lastPt.val / maxY) * graphHeight;
         
-        ctx.fillStyle = 'var(--accent-pink)';
+        ctx.fillStyle = COLOR_PINK;
         ctx.beginPath();
         ctx.arc(dotX, dotY, 5, 0, Math.PI * 2);
         ctx.fill();
@@ -337,7 +346,7 @@ export default {
           
           // Highlight regions depending on model
           if (modelType === 'logistic' && Math.abs(mathY - M) < 5) {
-             slopeCtx.strokeStyle = 'var(--accent-pink)';
+             slopeCtx.strokeStyle = COLOR_PINK;
           }
 
           slopeCtx.beginPath();

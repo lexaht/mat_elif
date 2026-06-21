@@ -14,6 +14,8 @@ export default {
       </p>
     </div>
 
+    <p>Prikkens <em>højde</em> tegner den bølge, vi kalder <strong>sinus</strong>. Følger vi i stedet prikkens vandrette afstand fra midten, får vi en næsten ens bølge, bare lidt forskudt — den kalder vi <strong>cosinus</strong>. Sinus og cosinus er altså to måder at måle den samme prik på pariserhjulet.</p>
+
     <p>Trigonometri starter altid med en cirkel. En harmonisk svingning er bare matematikkens ord for "en gentagende, bølgende bevægelse, der kommer af noget, der kører i ring". Det er derfor sinus og cosinus bruges til alt, der svinger i naturen.</p>
   `,
   formula: `
@@ -25,7 +27,8 @@ export default {
     <ul class="formula-desc-list">
       <li><strong><span data-math="A" data-display="inline"></span> (Amplitude):</strong> Bølgens højde (fra midten til toppen). Hvor voldsomt svinger den?</li>
       <li><strong><span data-math="\\omega" data-display="inline"></span> (Vinkelfrekvens):</strong> Hvor hurtigt kører vi rundt i cirklen? Bestemmer hvor tæt bølgerne ligger. <span data-math="\\omega = 2\\pi \\cdot f" data-display="inline"></span>.</li>
-      <li><strong><span data-math="\\phi" data-display="inline"></span> (Faseforskydning):</strong> Hvor starter vi henne i cirklen til tiden <span data-math="t=0" data-display="inline"></span>? Forskyder bølgen sidelæns.</li>
+      <li><strong>Periode (<span data-math="T" data-display="inline"></span>):</strong> Tiden for én hel svingning. Den hænger sammen med vinkelfrekvensen ved <span data-math="T = \\frac{2\\pi}{\\omega}" data-display="inline"></span>. Stor <span data-math="\\omega" data-display="inline"></span> giver kort periode (bølgerne ligger tæt).</li>
+      <li><strong><span data-math="\\phi" data-display="inline"></span> (Faseforskydning):</strong> Hvor starter vi henne i cirklen til tiden <span data-math="t=0" data-display="inline"></span>? Forskyder bølgen sidelæns. Et positivt <span data-math="\\phi" data-display="inline"></span> rykker bølgen til venstre, et negativt til højre.</li>
     </ul>
 
     <div style="margin-top: 30px; border-top: 1px solid var(--border-color); padding-top: 20px;">
@@ -51,6 +54,14 @@ export default {
     </div>
   `,
   initVisualizer: (container, controls, formulaContainer) => {
+    // Canvas understands real color strings, not CSS var(--...). Resolve them once.
+    const rootStyle = getComputedStyle(document.documentElement);
+    const cssVar = (name, fallback) => rootStyle.getPropertyValue(name).trim() || fallback;
+    const COLOR_PINK = cssVar('--accent-pink', '#ec4899');
+    const COLOR_EMERALD = cssVar('--accent-emerald', '#10b981');
+    const COLOR_INDIGO = cssVar('--accent-indigo', '#6366f1');
+    const COLOR_TEXT = cssVar('--text-primary', '#f3f4f6');
+
     // 1. MAIN VISUALIZER
     const canvas = document.createElement('canvas');
     canvas.className = 'visualizer-canvas';
@@ -158,7 +169,7 @@ export default {
       // Highlight active components on the circle axes
       ctx.lineWidth = 3;
       if (showSin) {
-        ctx.strokeStyle = 'var(--accent-pink)';
+        ctx.strokeStyle = COLOR_PINK;
         ctx.beginPath(); ctx.moveTo(px, circleCenter.y); ctx.lineTo(px, py); ctx.stroke();
         
         // Dotted line to wave
@@ -168,7 +179,7 @@ export default {
         ctx.setLineDash([]);
       }
       if (showCos) {
-        ctx.strokeStyle = 'var(--accent-emerald)';
+        ctx.strokeStyle = COLOR_EMERALD;
         ctx.beginPath(); ctx.moveTo(circleCenter.x, py); ctx.lineTo(px, py); ctx.stroke();
         
         // Dotted line to wave
@@ -179,7 +190,7 @@ export default {
       }
 
       // Draw point on circle
-      ctx.fillStyle = 'var(--text-primary)';
+      ctx.fillStyle = COLOR_TEXT;
       ctx.beginPath(); ctx.arc(px, py, 6, 0, Math.PI * 2); ctx.fill();
 
       // Draw wave axes
@@ -221,7 +232,7 @@ export default {
       // Draw wave history
       ctx.lineWidth = 3;
       if (showSin && history.length > 0) {
-        ctx.strokeStyle = 'var(--accent-pink)';
+        ctx.strokeStyle = COLOR_PINK;
         ctx.beginPath();
         ctx.moveTo(waveStart, history[0].sin);
         for (let i = 1; i < history.length; i++) {
@@ -230,7 +241,7 @@ export default {
         ctx.stroke();
       }
       if (showCos && history.length > 0) {
-        ctx.strokeStyle = 'var(--accent-emerald)';
+        ctx.strokeStyle = COLOR_EMERALD;
         ctx.beginPath();
         ctx.moveTo(waveStart, circleCenter.y - (history[0].cos - circleCenter.x));
         for (let i = 1; i < history.length; i++) {
@@ -321,7 +332,7 @@ export default {
       fCtx.fillText("-1", 15, centerY + maxAmplitude + 4);
 
       // Wave
-      fCtx.strokeStyle = 'var(--accent-indigo)';
+      fCtx.strokeStyle = COLOR_INDIGO;
       fCtx.lineWidth = 3;
       fCtx.beginPath();
       for(let x = 0; x < w; x++) {

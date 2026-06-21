@@ -30,11 +30,21 @@ export default {
     <p>Vektoren viser retningen, men hvor hurtigt kører vi? Farten er hastighedsvektorens længde, som findes med Pythagoras:</p>
     <div data-math="|\\vec{v}(t)| = \\sqrt{(x'(t))^2 + (y'(t))^2}"></div>
     
+    <p style="margin-top: 20px;"><strong>Tangent til banekurven:</strong></p>
+    <p>Tangenten til banekurven i punktet svarende til <span data-math="t_0" data-display="inline"></span> har hastighedsvektoren som retningsvektor:</p>
+    <div data-math="\\begin{pmatrix} x \\\\ y \\end{pmatrix} = \\vec{r}(t_0) + s \\cdot \\vec{r}\\,'(t_0)"></div>
+
     <p style="margin-top: 20px;"><strong>Accelerationsvektor:</strong></p>
-    <p>Differentiere vi hastigheden, får vi <strong>accelerationen</strong>, som peger ind mod kurvens "krumning" (f.eks. ind mod midten af et loop):</p>
+    <p>Differentierer vi hastigheden, får vi <strong>accelerationsvektoren</strong>. Den fortæller hvordan hastigheden ændrer sig — både hvis farten øges/bremses, og hvis retningen drejer. Når farten er konstant og banen krummer, peger accelerationen vinkelret ind mod kurvens indre (centripetalt, som ind mod midten af et sving).</p>
     <div data-math="\\vec{a}(t) = \\vec{v}'(t) = \\vec{r}''(t) = \\begin{pmatrix} x''(t) \\\\ y''(t) \\end{pmatrix}"></div>
   `,
   initVisualizer: (container, controls, formulaContainer) => {
+    // Canvas understands real color strings, not CSS var(--...). Resolve them once.
+    const rootStyle = getComputedStyle(document.documentElement);
+    const cssVar = (name, fallback) => rootStyle.getPropertyValue(name).trim() || fallback;
+    const COLOR_EMERALD = cssVar('--accent-emerald', '#10b981');
+    const COLOR_PINK = cssVar('--accent-pink', '#ec4899');
+
     const canvas = document.createElement('canvas');
     canvas.className = 'visualizer-canvas';
     container.appendChild(canvas);
@@ -196,7 +206,7 @@ export default {
         const visualVelScale = 0.2; 
         const vx = vxFn(t) * visualVelScale;
         const vy = vyFn(t) * visualVelScale;
-        drawArrow(ctx, currX, currY, currX + vx, currY + vy, 'var(--accent-emerald)');
+        drawArrow(ctx, currX, currY, currX + vx, currY + vy, COLOR_EMERALD);
       }
 
       // Draw acceleration vector (inwards)
@@ -204,7 +214,7 @@ export default {
         const visualAccScale = 0.05;
         const ax = axFn(t) * visualAccScale;
         const ay = ayFn(t) * visualAccScale;
-        drawArrow(ctx, currX, currY, currX + ax, currY + ay, 'var(--accent-pink)');
+        drawArrow(ctx, currX, currY, currX + ax, currY + ay, COLOR_PINK);
       }
 
       if (isPlaying) {

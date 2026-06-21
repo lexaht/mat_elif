@@ -33,8 +33,17 @@ export default {
     <p style="margin-top: 20px;"><strong>Stationære punkter:</strong></p>
     <p>På en bjergtop, i bunden af en dal, eller midt i et bjergpas (sadelpunkt), er terrænet helt fladt i det specifikke punkt. Her gælder det at hældningen er 0 i alle retninger:</p>
     <div data-math="\\nabla f(x,y) = \\begin{pmatrix} 0 \\\\ 0 \\end{pmatrix}"></div>
+
+    <p>I et stationært punkt er gradienten nul, men det afslører ikke <em>hvilken</em> slags punkt det er. Man skelner via de andenordens partielle afledte, fx diskriminanten <span data-math="d = f''_{xx}\\cdot f''_{yy} - (f''_{xy})^2" data-display='inline'></span>: er <span data-math="d>0" data-display='inline'></span> er det en top eller dal, er <span data-math="d<0" data-display='inline'></span> er det et sadelpunkt.</p>
+
+    <p>Gradienten står altid vinkelret på niveaukurverne (højdekurverne) og peger den stejleste vej opad.</p>
   `,
   initVisualizer: (container, controls, formulaContainer) => {
+    // Canvas understands real color strings, not CSS var(--...). Resolve them once.
+    const rootStyle = getComputedStyle(document.documentElement);
+    const cssVar = (name, fallback) => rootStyle.getPropertyValue(name).trim() || fallback;
+    const COLOR_TEXT = cssVar('--text-primary', '#f3f4f6');
+
     const canvas = document.createElement('canvas');
     canvas.className = 'visualizer-canvas';
     canvas.style.cursor = 'crosshair';
@@ -257,7 +266,7 @@ export default {
         ctx.fill();
 
         // Draw dot at base
-        ctx.fillStyle = 'var(--text-primary)';
+        ctx.fillStyle = COLOR_TEXT;
         ctx.beginPath(); ctx.arc(mousePos.x, mousePos.y, 4, 0, Math.PI*2); ctx.fill();
 
         // Text output near cursor

@@ -28,11 +28,14 @@ export default {
         <strong>Kartesisk til Polær:</strong>
         <div data-math="r = \\sqrt{x^2 + y^2}"></div>
         <div data-math="\\theta = \\arctan\\left(\\frac{y}{x}\\right)"></div>
+        <p style='font-size:13px; color:var(--text-secondary);'>Pas på: <span data-math='\\arctan(y/x)' data-display='inline'></span> rammer kun rigtigt når <span data-math='x>0' data-display='inline'></span>. Ligger punktet i 2. eller 3. kvadrant (<span data-math='x<0' data-display='inline'></span>), skal du lægge <span data-math='\\pi' data-display='inline'></span> (180°) til. Derfor bruger man i praksis <span data-math='\\operatorname{atan2}(y,x)' data-display='inline'></span>, som selv vælger den rigtige kvadrant.</p>
       </div>
     </div>
 
     <p><strong>Bonus for 3.g (Komplekse tal):</strong> Polære koordinater bruges intensivt til at beskrive komplekse tal. I stedet for <span data-math="z = x + i\\cdot y" data-display="inline"></span> kan et komplekst tal skrives med polære koordinater via <strong>Eulers formel</strong>:</p>
     <div data-math="z = r \\cdot e^{i\\cdot\\theta} = r(\\cos\\theta + i\\cdot\\sin\\theta)"></div>
+    <p>Den store gevinst: når du ganger to komplekse tal i polær form, ganger du radierne og lægger vinklerne sammen: <span data-math='r_1 e^{i\\theta_1}\\cdot r_2 e^{i\\theta_2} = r_1 r_2\\, e^{i(\\theta_1+\\theta_2)}' data-display='inline'></span>. Multiplikation bliver til en drejning.</p>
+    <p style="font-size:13px; color:var(--text-secondary);">(For <span data-math='r=\\cos(n\\theta)' data-display='inline'></span> giver ulige n netop n blade, mens lige n giver 2n blade.)</p>
 
     <div style="margin-top: 30px; border-top: 1px solid var(--border-color); padding-top: 20px;">
       <h4 style="margin-bottom: 10px; color: var(--accent-blue);">Live Koordinat-Omregner</h4>
@@ -56,6 +59,14 @@ export default {
     </div>
   `,
   initVisualizer: (container, controls, formulaContainer) => {
+    // Canvas understands real color strings, not CSS var(--...). Resolve them once.
+    const rootStyle = getComputedStyle(document.documentElement);
+    const cssVar = (n, fb) => rootStyle.getPropertyValue(n).trim() || fb;
+    const COLOR_EMERALD = cssVar('--accent-emerald', '#10b981');
+    const COLOR_PINK = cssVar('--accent-pink', '#ec4899');
+    const COLOR_BLUE = cssVar('--accent-blue', '#3b82f6');
+    const COLOR_TEXT = cssVar('--text-primary', '#f3f4f6');
+
     // 1. MAIN VISUALIZER (Rose Curve)
     const canvas = document.createElement('canvas');
     canvas.className = 'visualizer-canvas';
@@ -81,7 +92,7 @@ export default {
         </select>
       </div>
       <div class="control-group" id="p1-container">
-        <label class="control-label"><span id="p1-label">Blad-parameter (n):</span> <span class="control-value" id="p1-val">4</span></label>
+        <label class="control-label"><span id="p1-label">Frekvens (n):</span> <span class="control-value" id="p1-val">4</span></label>
         <input type="range" class="slider-input" id="p1-slider" min="1" max="10" value="4">
       </div>
       <div class="control-group" id="p2-container">
@@ -107,7 +118,7 @@ export default {
 
     function updateUI() {
       if (shapeType === 'rose') {
-        p1Label.textContent = 'Blad-parameter (n):';
+        p1Label.textContent = 'Frekvens (n):';
         p2Label.textContent = 'Kompleksitet (d):';
         p2Container.style.display = 'block';
         p1Slider.max = 10; p2Slider.max = 10;
@@ -166,12 +177,13 @@ export default {
         return Math.cos(k * theta) * maxRadius;
       } else if (shapeType === 'cardioid') {
         // scaled so max r is maxRadius
-        const maxExpected = 1 + param1; 
-        return ((1 + param1 * Math.cos(theta)) / maxExpected) * maxRadius;
+        const maxExpected = 1 + param1;
+        return Math.min(((1 + param1 * Math.cos(theta)) / maxExpected) * maxRadius, maxRadius);
       } else if (shapeType === 'spiral') {
         // limit spiral max size visually
-        return (param1 * theta) * (maxRadius / 20);
+        return Math.min((param1 * theta) * (maxRadius / 20), maxRadius);
       }
+      return 0;
     }
 
     function drawMain() {
@@ -225,7 +237,7 @@ export default {
 
       // Draw thick history curve
       if (history.length > 0) {
-        ctx.strokeStyle = 'var(--accent-emerald)';
+        ctx.strokeStyle = COLOR_EMERALD;
         ctx.lineWidth = 3;
         ctx.beginPath();
         ctx.moveTo(history[0].x, history[0].y);
@@ -242,7 +254,7 @@ export default {
       ctx.stroke();
 
       // Draw active point
-      ctx.fillStyle = 'var(--text-primary)';
+      ctx.fillStyle = COLOR_TEXT;
       ctx.beginPath(); ctx.arc(px, py, 5, 0, Math.PI*2); ctx.fill();
     }
 
@@ -252,6 +264,7 @@ export default {
     let cCtx = null;
     let cObserver = null;
     let isDragging = false;
+    let mouseUpHandler = null;
     let point = { x: 50, y: -50 }; // Logical coordinates (-100 to 100)
 
     function updateConverterText() {
@@ -320,7 +333,8 @@ export default {
         if(r > 100) { point.x = (point.x/r)*100; point.y = (point.y/r)*100; }
         updateConverterText(); drawConverter();
       });
-      window.addEventListener('mouseup', () => { isDragging = false; });
+      mouseUpHandler = () => { isDragging = false; };
+      window.addEventListener('mouseup', mouseUpHandler);
 
       cObserver = new ResizeObserver(() => {
         const rect = cContainer.getBoundingClientRect();
@@ -359,18 +373,18 @@ export default {
       const py = cy - (point.y / 100) * R;
 
       // X and Y lines
-      cCtx.strokeStyle = 'var(--accent-pink)'; cCtx.setLineDash([4,4]);
+      cCtx.strokeStyle = COLOR_PINK; cCtx.setLineDash([4,4]);
       cCtx.beginPath(); cCtx.moveTo(px, cy); cCtx.lineTo(px, py); cCtx.stroke(); // Y
       cCtx.beginPath(); cCtx.moveTo(cx, py); cCtx.lineTo(px, py); cCtx.stroke(); // X
       cCtx.setLineDash([]);
 
       // Radius line
-      cCtx.strokeStyle = 'var(--accent-emerald)'; cCtx.lineWidth = 2;
+      cCtx.strokeStyle = COLOR_EMERALD; cCtx.lineWidth = 2;
       cCtx.beginPath(); cCtx.moveTo(cx, cy); cCtx.lineTo(px, py); cCtx.stroke();
 
       // Angle arc
       const theta = Math.atan2(-point.y, point.x); // screen Y is inverted
-      cCtx.strokeStyle = 'var(--accent-blue)';
+      cCtx.strokeStyle = COLOR_BLUE;
       cCtx.beginPath();
       cCtx.arc(cx, cy, R*0.2, 0, theta, theta < 0);
       cCtx.stroke();
@@ -389,6 +403,7 @@ export default {
       cancelAnimationFrame(animationId);
       mainObserver.disconnect();
       if(cObserver) cObserver.disconnect();
+      if(mouseUpHandler) window.removeEventListener('mouseup', mouseUpHandler);
     };
   }
 };
