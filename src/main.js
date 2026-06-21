@@ -4,6 +4,8 @@ import diffTopic from './topics/differential_equations.js';
 import intTopic from './topics/integrals.js';
 import polarTopic from './topics/polar_coordinates.js';
 import normTopic from './topics/normal_distribution.js';
+import vectorTopic from './topics/vector_functions.js';
+import func2dTopic from './topics/functions_2d.js';
 
 // Topic Map
 const topics = {
@@ -11,7 +13,9 @@ const topics = {
   diff: diffTopic,
   int: intTopic,
   polar: polarTopic,
-  norm: normTopic
+  norm: normTopic,
+  vector: vectorTopic,
+  func2d: func2dTopic
 };
 
 let activeTopicKey = 'trig';
@@ -107,8 +111,8 @@ function loadTopic(topicKey) {
   // Reset the formula drawer
   resetFormulaDrawer();
 
-  // Initialize new visualizer
-  currentCleanup = topic.initVisualizer(visualizerContainer, visualizerControls);
+  // Initialize new visualizer and pass formulaContent so modules can inject interactive elements
+  currentCleanup = topic.initVisualizer(visualizerContainer, visualizerControls, formulaContent);
 
   // Set active class on buttons
   document.querySelectorAll('.nav-btn').forEach(btn => {

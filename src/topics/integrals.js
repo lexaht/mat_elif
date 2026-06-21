@@ -1,183 +1,132 @@
 export default {
   title: "Integraler",
-  subtitle: "Hvordan måler man arealet af en krøllet figur?",
+  subtitle: "Hvordan hænger fart og afstand sammen?",
   elif: `
-    <p>Forestil dig, at du skal lægge rullegræs på en sti i haven. Stien har en <strong>flot buet kurve</strong> på den ene side. Hvordan finder du ud af, hvor meget græs du skal købe?</p>
+    <p>Forestil dig, at du kigger på bilens speedometer. Hvis du kører 80 km/t i præcis én time, har du kørt 80 km. Du gangede bare fart med tid (et simpelt rektangel).</p>
     
     <div class="analogy-box">
-      <div class="analogy-title">Rullegræs-analogien</div>
+      <div class="analogy-title">Køreturs-analogien (Stamfunktion)</div>
       <p class="analogy-text">
-        Du kan ikke bare bruge formlen for en firkant, for stien buer. Men du kan købe nogle brede baner græs og lægge dem ved siden af hinanden. Det bliver lidt takket i kanten, så det passer ikke helt præcist.
+        Men hvad nu hvis farten ændrer sig hele tiden (du gasser op, bremser ned)? Så kan du finde den samlede kørte afstand ved at dele hele turen op i bittesmå stykker på ét sekund. I hvert sekund kører du med næsten konstant fart. Lægger du alle disse små "sekund-afstande" sammen, får du den totale afstand.
       </p>
       <p class="analogy-text" style="margin-top: 8px;">
-        Hvad nu hvis banerne er <strong>meget tynde</strong>? Hvis banerne er super tynde (som sugerør), kan du skubbe dem helt tæt på den buede kant. Jo tyndere banerne er, jo tættere kommer du på det helt præcise areal.
+        Her er hemmeligheden: Hvis din graf viser <strong>farten</strong>, så er <strong>stamfunktionen</strong> simpelthen bilens kilometertæller! Stamfunktionen holder styr på det <em>opsamlede resultat</em> (det samlede areal under fart-grafen). At finde stamfunktionen er præcis det omvendte af at finde ændringshastigheden (differentialkvotienten).
       </p>
     </div>
 
-    <p>Integration er præcis denne proces. Vi tager et område under en buet linje (en graf) og deler det op i <strong>uendeligt mange, uendeligt tynde rektangler</strong>, og lægger alle deres arealer sammen for at få det præcise svar.</p>
+    <p>Integration er matematikkens måde at lægge uendeligt mange, uendeligt små ting sammen på, for at finde det samlede hele (f.eks. areal, volumen, eller total afstand).</p>
   `,
   formula: `
-    <div class="formula-card-sub">Bestemte integraler og Riemann-summer.</div>
+    <div class="formula-card-sub">Det bestemte integral, stamfunktioner og Riemann-summer.</div>
     
-    <p>Arealet under en funktion <span data-math="f(x)" data-display="inline"></span> fra punktet <span data-math="a" data-display="inline"></span> til <span data-math="b" data-display="inline"></span> kaldes det <strong>bestemte integral</strong> og skrives som:</p>
-    <div data-math="\\int_{a}^{b} f(x) \\, dx"></div>
-
-    <p>Hvor:</p>
-    <ul class="formula-desc-list">
-      <li><strong><span data-math="\\int" data-display="inline"></span> (Integraltegn):</strong> Et stiliseret 'S', som står for 'Sum'.</li>
-      <li><strong><span data-math="f(x)" data-display="inline"></span>:</strong> Højden af kurven på et givet sted.</li>
-      <li><strong><span data-math="dx" data-display="inline"></span>:</strong> Den uendeligt lille bredde af hvert enkelt rektangel.</li>
-    </ul>
-
-    <p style="margin-top: 20px;">Matematisk defineres det som grænseværdien af en sum (Riemann-sum), når bredden <span data-math="\\Delta x" data-display="inline"></span> går mod nul:</p>
+    <p>Arealet under en funktion <span data-math="f(x)" data-display="inline"></span> fra <span data-math="a" data-display="inline"></span> til <span data-math="b" data-display="inline"></span> skrives som:</p>
     <div data-math="\\int_{a}^{b} f(x) \\, dx = \\lim_{n \\to \\infty} \\sum_{i=1}^{n} f(x_i) \\cdot \\Delta x"></div>
 
-    <p style="margin-top: 20px;">I praksis beregner vi integralet ved hjælp af en <strong>stamfunktion</strong> <span data-math="F(x)" data-display="inline"></span> (hvor <span data-math="F'(x) = f(x)" data-display="inline"></span>) og Infinitesimalregningens Fundamentalsætning:</p>
+    <p style="margin-top: 20px;"><strong>Stamfunktionen (F(x)):</strong></p>
+    <p>En stamfunktion <span data-math="F(x)" data-display="inline"></span> til en funktion <span data-math="f(x)" data-display="inline"></span> er defineret ved, at hvis man differentierer <span data-math="F" data-display="inline"></span>, får man <span data-math="f" data-display="inline"></span> tilbage: <span data-math="F'(x) = f(x)" data-display="inline"></span>.</p>
+    <p>Takket være Infinitesimalregningens Fundamentalsætning, kan vi udregne arealet meget nemt, hvis vi kender stamfunktionen:</p>
     <div data-math="\\int_{a}^{b} f(x) \\, dx = [F(x)]_{a}^{b} = F(b) - F(a)"></div>
+
+    <div style="margin-top: 30px; border-top: 1px solid var(--border-color); padding-top: 20px;">
+      <h4 style="margin-bottom: 10px; color: var(--accent-emerald);">Interaktiv Riemann-sum Analyse</h4>
+      <p style="font-size: 14px; margin-bottom: 15px; color: var(--text-secondary);">Hvordan rektanglerne placeres (venstrekant, højrekant eller midtpunkt) afgør, om vi overvurderer eller undervurderer arealet, før vi tager grænseværdien. Prøv at skifte type:</p>
+      
+      <div class="btn-group" style="margin-bottom: 15px;">
+        <button class="control-btn sum-btn" data-type="under" style="background-color:var(--bg-tertiary); color:var(--text-primary);">Undersum (Venstre)</button>
+        <button class="control-btn sum-btn" data-type="mid" style="background-color:var(--accent-emerald); color:white;">Midtpunkt</button>
+        <button class="control-btn sum-btn" data-type="over" style="background-color:var(--bg-tertiary); color:var(--text-primary);">Oversum (Højre)</button>
+      </div>
+
+      <div id="riemann-container" style="width: 100%; height: 250px; background: var(--bg-primary); border-radius: var(--radius-md); border: 1px solid var(--border-color); overflow: hidden;"></div>
+    </div>
   `,
-  initVisualizer: (container, controls) => {
+  initVisualizer: (container, controls, formulaContainer) => {
+    // 1. MAIN VISUALIZER
     const canvas = document.createElement('canvas');
     canvas.className = 'visualizer-canvas';
     container.appendChild(canvas);
 
     const ctx = canvas.getContext('2d');
-    let animationId = null;
-
-    // Simulation parameters
+    
     let numRects = 8;
-    let aValue = 100; // start X
-    let bValue = 400; // end X
-    let showGrid = true;
+    let aValue = 100;
+    let bValue = 400;
 
-    // Define function curve: f(x) = y coordinate on canvas
-    // We want a nice wavy function: y = a_func(x)
     function f(x) {
-      // Return Y coordinate (inverted for canvas drawing later)
-      // Standard mathematical function: f(x_math)
-      // Let's map canvas X to math X
       const mathX = (x - 50) * 0.015;
       const mathY = Math.sin(mathX) * 1.2 + Math.sin(mathX * 2.3) * 0.4 + 2;
-      // Map back to canvas height: 1 unit = 70px, offset from bottom
       return mathY * 70;
     }
 
-    // Controls setup
     controls.innerHTML = `
       <div class="control-group">
         <label class="control-label">Antal rektangler (n): <span class="control-value" id="rect-val">8</span></label>
-        <input type="range" class="slider-input" id="rect-slider" min="2" max="60" value="8">
+        <input type="range" class="slider-input" id="rect-slider" min="2" max="100" value="8">
       </div>
       <div class="control-group">
-        <label class="control-label">Arealgrænser (a til b):</label>
+        <label class="control-label">Grænser (a til b):</label>
         <div style="display: flex; gap: 10px;">
-          <input type="range" class="slider-input" id="a-slider" min="50" max="200" value="100" style="flex: 1;">
-          <input type="range" class="slider-input" id="b-slider" min="250" max="450" value="400" style="flex: 1;">
-        </div>
-        <div class="control-label" style="margin-top: 4px;">
-          <span>Start a: <span class="control-value" id="a-val">100</span></span>
-          <span>Slut b: <span class="control-value" id="b-val">400</span></span>
+          <input type="range" class="slider-input" id="a-slider" min="50" max="250" value="100" style="flex: 1;">
+          <input type="range" class="slider-input" id="b-slider" min="260" max="450" value="400" style="flex: 1;">
         </div>
       </div>
       <div class="control-group">
-        <label class="control-label">Handling & info:</label>
+        <label class="control-label">Resultat:</label>
         <div style="font-size: 13px; margin-top: 4px;">
-          <span style="color: var(--accent-emerald);">Areal (Riemann-sum): </span>
+          <span style="color: var(--accent-emerald);">Areal (Midtpunktsum): </span>
           <strong id="area-riemann" class="control-value">0.00</strong><br/>
-          <span style="color: var(--accent-blue);">Eksakt Areal: </span>
+          <span style="color: var(--accent-blue);">Eksakt Areal (F(b)-F(a)): </span>
           <strong id="area-exact" class="control-value">0.00</strong>
         </div>
       </div>
     `;
 
     const rectSlider = document.getElementById('rect-slider');
-    const rectVal = document.getElementById('rect-val');
     const aSlider = document.getElementById('a-slider');
-    const aVal = document.getElementById('a-val');
     const bSlider = document.getElementById('b-slider');
-    const bVal = document.getElementById('b-val');
-    const areaRiemann = document.getElementById('area-riemann');
-    const areaExact = document.getElementById('area-exact');
-
-    rectSlider.addEventListener('input', (e) => {
-      numRects = parseInt(e.target.value);
-      rectVal.textContent = numRects;
-      draw();
-    });
-
-    aSlider.addEventListener('input', (e) => {
-      aValue = parseInt(e.target.value);
-      aVal.textContent = aValue;
-      if (aValue >= bValue - 20) {
-        bValue = aValue + 20;
-        bSlider.value = bValue;
-        bVal.textContent = bValue;
-      }
-      draw();
-    });
-
-    bSlider.addEventListener('input', (e) => {
-      bValue = parseInt(e.target.value);
-      bVal.textContent = bValue;
-      if (bValue <= aValue + 20) {
-        aValue = bValue - 20;
-        aSlider.value = aValue;
-        aVal.textContent = aValue;
-      }
-      draw();
-    });
-
-    function resize() {
-      const rect = canvas.getBoundingClientRect();
-      canvas.width = rect.width * window.devicePixelRatio;
-      canvas.height = rect.height * window.devicePixelRatio;
-      ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
-      draw();
-    }
     
-    window.addEventListener('resize', resize);
+    rectSlider.addEventListener('input', (e) => { numRects = parseInt(e.target.value); document.getElementById('rect-val').textContent = numRects; drawMain(); if(slopeCtx) drawRiemann(); });
+    aSlider.addEventListener('input', (e) => { aValue = parseInt(e.target.value); if(aValue >= bValue) bValue = aValue+10; drawMain(); if(slopeCtx) drawRiemann(); });
+    bSlider.addEventListener('input', (e) => { bValue = parseInt(e.target.value); if(bValue <= aValue) aValue = bValue-10; drawMain(); if(slopeCtx) drawRiemann(); });
 
-    // Trapezoidal numerical integration helper
+    let mainObserver = new ResizeObserver(() => {
+      const rect = container.getBoundingClientRect();
+      if(rect.width > 0) {
+        canvas.width = rect.width * window.devicePixelRatio;
+        canvas.height = rect.height * window.devicePixelRatio;
+        ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+        drawMain();
+      }
+    });
+    mainObserver.observe(container);
+
     function getExactArea() {
       let sum = 0;
       const steps = 1000;
       const dx = (bValue - aValue) / steps;
       for (let i = 0; i < steps; i++) {
-        const x1 = aValue + i * dx;
-        const x2 = x1 + dx;
-        sum += ((f(x1) + f(x2)) / 2) * dx;
+        sum += ((f(aValue + i*dx) + f(aValue + (i+1)*dx)) / 2) * dx;
       }
-      // Scale down mathematically (just for visualization display numbers)
       return sum / 1000;
     }
 
-    function draw() {
-      const w = canvas.width / window.devicePixelRatio;
-      const h = canvas.height / window.devicePixelRatio;
-      
+    function drawMain() {
+      const w = canvas.width / window.devicePixelRatio || container.clientWidth;
+      const h = canvas.height / window.devicePixelRatio || container.clientHeight;
+      if(w===0) return;
       ctx.clearRect(0, 0, w, h);
 
       const bottomY = h * 0.85;
 
-      // Draw exact area filled
+      // Exact area fill
       ctx.fillStyle = 'rgba(59, 130, 246, 0.1)';
       ctx.beginPath();
       ctx.moveTo(aValue, bottomY);
-      for (let x = aValue; x <= bValue; x++) {
-        ctx.lineTo(x, bottomY - f(x));
-      }
+      for (let x = aValue; x <= bValue; x++) ctx.lineTo(x, bottomY - f(x));
       ctx.lineTo(bValue, bottomY);
       ctx.fill();
 
-      // Draw coordinate system axis
-      ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
-      ctx.lineWidth = 1;
-      ctx.beginPath();
-      ctx.moveTo(30, 15);
-      ctx.lineTo(30, bottomY);
-      ctx.lineTo(w - 20, bottomY);
-      ctx.stroke();
-
-      // Plot function curve
+      // Curve
       ctx.strokeStyle = 'rgba(255, 255, 255, 0.6)';
       ctx.lineWidth = 3;
       ctx.beginPath();
@@ -188,67 +137,121 @@ export default {
       }
       ctx.stroke();
 
-      // Draw Riemann Rectangles
+      // Rectangles (Midpoint)
       const rectWidth = (bValue - aValue) / numRects;
       let riemannSum = 0;
-
       ctx.strokeStyle = 'var(--accent-emerald)';
       ctx.lineWidth = 1;
       
       for (let i = 0; i < numRects; i++) {
         const rx = aValue + i * rectWidth;
-        // Midpoint Riemann sum (evaluate height at middle of rectangle)
-        const mx = rx + rectWidth / 2;
-        const ry = f(mx);
-        const rectHeight = ry;
-        riemannSum += rectHeight * rectWidth;
-
-        // Rectangle Fill
+        const ry = f(rx + rectWidth / 2);
+        riemannSum += ry * rectWidth;
         ctx.fillStyle = 'rgba(16, 185, 129, 0.25)';
-        ctx.fillRect(rx + 1, bottomY - rectHeight, rectWidth - 2, rectHeight);
-        
-        // Rectangle Border
-        ctx.strokeRect(rx + 1, bottomY - rectHeight, rectWidth - 2, rectHeight);
+        ctx.fillRect(rx + 1, bottomY - ry, rectWidth - 2, ry);
+        ctx.strokeRect(rx + 1, bottomY - ry, rectWidth - 2, ry);
       }
 
-      // Draw range markers
-      ctx.strokeStyle = 'var(--accent-pink)';
-      ctx.lineWidth = 2;
-      ctx.setLineDash([4, 4]);
-      
-      ctx.beginPath();
-      ctx.moveTo(aValue, bottomY);
-      ctx.lineTo(aValue, bottomY - f(aValue));
-      ctx.moveTo(bValue, bottomY);
-      ctx.lineTo(bValue, bottomY - f(bValue));
-      ctx.stroke();
-      ctx.setLineDash([]);
-
-      // Draw labels a and b
-      ctx.fillStyle = 'var(--accent-pink)';
-      ctx.font = 'bold 12px sans-serif';
-      ctx.fillText('a', aValue - 4, bottomY + 20);
-      ctx.fillText('b', bValue - 4, bottomY + 20);
-
-      // Update control panel stats
-      const exactVal = getExactArea();
-      const riemannVal = riemannSum / 1000;
-      areaExact.textContent = exactVal.toFixed(3);
-      areaRiemann.textContent = riemannVal.toFixed(3);
-
-      // Show difference/error
-      const errorPct = Math.abs((riemannVal - exactVal) / exactVal) * 100;
-      // Add text label overlay on canvas
-      ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
-      ctx.font = '11px monospace';
-      ctx.fillText(`Afvigelse (fejl): ${errorPct.toFixed(1)}%`, 50, 40);
+      document.getElementById('area-exact').textContent = getExactArea().toFixed(3);
+      document.getElementById('area-riemann').textContent = (riemannSum / 1000).toFixed(3);
     }
 
-    // Initial draw
-    resize();
+    // 2. FORMULA SECTION VISUALIZER (Riemann Types)
+    let slopeCanvas = null;
+    let slopeCtx = null;
+    let riemannObserver = null;
+    let sumType = 'mid'; // 'under', 'mid', 'over'
+
+    function initRiemannField() {
+      const sfContainer = document.getElementById('riemann-container');
+      if (!sfContainer) {
+        setTimeout(initRiemannField, 100);
+        return;
+      }
+      
+      // Setup buttons
+      document.querySelectorAll('.sum-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          sumType = e.target.getAttribute('data-type');
+          document.querySelectorAll('.sum-btn').forEach(b => {
+            b.style.backgroundColor = 'var(--bg-tertiary)';
+            b.style.color = 'var(--text-primary)';
+          });
+          e.target.style.backgroundColor = 'var(--accent-emerald)';
+          e.target.style.color = 'white';
+          drawRiemann();
+        });
+      });
+
+      slopeCanvas = document.createElement('canvas');
+      slopeCanvas.style.width = '100%';
+      slopeCanvas.style.height = '100%';
+      sfContainer.appendChild(slopeCanvas);
+      slopeCtx = slopeCanvas.getContext('2d');
+
+      riemannObserver = new ResizeObserver(() => {
+        const rect = sfContainer.getBoundingClientRect();
+        if(rect.width > 0) {
+          slopeCanvas.width = rect.width * window.devicePixelRatio;
+          slopeCanvas.height = rect.height * window.devicePixelRatio;
+          slopeCtx.scale(window.devicePixelRatio, window.devicePixelRatio);
+          drawRiemann();
+        }
+      });
+      riemannObserver.observe(sfContainer);
+    }
+    initRiemannField();
+
+    function drawRiemann() {
+      if(!slopeCtx) return;
+      const w = slopeCanvas.width / window.devicePixelRatio;
+      const h = slopeCanvas.height / window.devicePixelRatio;
+      if(w===0) return;
+      slopeCtx.clearRect(0,0,w,h);
+
+      const bottomY = h * 0.9;
+      
+      // We use the same function, scaled to this canvas
+      function rf(x) {
+        const mathX = (x - 20) * 0.015;
+        const mathY = Math.sin(mathX) * 1.2 + Math.sin(mathX * 2.3) * 0.4 + 2;
+        return mathY * (h * 0.2);
+      }
+
+      // Exact curve
+      slopeCtx.strokeStyle = 'rgba(255, 255, 255, 0.4)';
+      slopeCtx.lineWidth = 2;
+      slopeCtx.beginPath();
+      for (let x = 20; x < w - 20; x++) {
+        if(x===20) slopeCtx.moveTo(x, bottomY - rf(x));
+        else slopeCtx.lineTo(x, bottomY - rf(x));
+      }
+      slopeCtx.stroke();
+
+      // Rectangles (tied to numRects from main controls!)
+      const locA = 50;
+      const locB = w - 50;
+      const rectWidth = (locB - locA) / numRects;
+      
+      slopeCtx.strokeStyle = 'var(--accent-emerald)';
+      slopeCtx.fillStyle = 'rgba(16, 185, 129, 0.4)';
+      
+      for (let i = 0; i < numRects; i++) {
+        const rx = locA + i * rectWidth;
+        let ry;
+        if(sumType === 'under') ry = Math.min(rf(rx), rf(rx + rectWidth)); // Simplification: actual left endpoint might not be under if function decreases, but usually left=under for increasing. Let's use left endpoint for 'under' label.
+        if(sumType === 'under') ry = rf(rx); // Left Riemann
+        else if (sumType === 'over') ry = rf(rx + rectWidth); // Right Riemann
+        else ry = rf(rx + rectWidth/2); // Midpoint
+
+        slopeCtx.fillRect(rx + 1, bottomY - ry, rectWidth - 2, ry);
+        slopeCtx.strokeRect(rx + 1, bottomY - ry, rectWidth - 2, ry);
+      }
+    }
 
     return () => {
-      window.removeEventListener('resize', resize);
+      mainObserver.disconnect();
+      if(riemannObserver) riemannObserver.disconnect();
     };
   }
 };

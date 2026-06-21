@@ -1,282 +1,349 @@
 export default {
   title: "Trigonometriske Funktioner",
-  subtitle: "Hvad har bølger og cirkler med hinanden at gøre?",
+  subtitle: "Cirkler, bølger og svingninger",
   elif: `
-    <p>Forestil dig, at du sidder i et <strong>pariserhjul</strong> (eller kigger på en cykelpedal, der kører rundt). Hjulet drejer rundt i en fast cirkel.</p>
+    <p>Har du nogensinde tænkt over, hvorfor bølgerne på havet, et pendul på et bornholmerur, og lyden fra en guitarstreng alle ligner hinanden?</p>
     
     <div class="analogy-box">
-      <div class="analogy-title">Pariserhjul-analogien</div>
+      <div class="analogy-title">Pariserhjuls-analogien (Harmonisk svingning)</div>
       <p class="analogy-text">
-        Hvis du står foran hjulet og måler, <strong>hvor højt over jorden</strong> din ven i pariserhjulet er, vil du se, at de kører op, flader ud i toppen, kører ned, og flader ud i bunden. Tegner du denne højde over tid, får du en blød, bølgende streg. Det kalder vi en <strong>sinus-bølge</strong>.
+        Forestil dig, at du kigger på et pariserhjul direkte fra siden (så det bare ligner en streg, der går op og ned). Hvis du tegner en prik på hjulet og følger dens højde, vil den starte i midten, gå op til toppen, ned gennem midten til bunden, og op igen.
       </p>
       <p class="analogy-text" style="margin-top: 8px;">
-        Hvis du i stedet ligger på jorden direkte under hjulet og måler, <strong>hvor langt til højre eller venstre</strong> din ven er fra midten, får du en bølge, der er rykket en lille smule. Det kalder vi en <strong>cosinus-bølge</strong>.
+        Hvis hjulet drejer med en konstant hastighed, og du ruller et langt stykke papir forbi bagved, vil prikken tegne en perfekt bølge!
       </p>
     </div>
 
-    <p>Trigonometri handler dybest set bare om at beskrive denne cirkel-bevægelse. Når noget gentager sig (som lydbølger, lys, havbølger eller årstider), bruger vi sinus og cosinus til at beskrive det i computerprogrammer og fysik.</p>
+    <p>Trigonometri starter altid med en cirkel. En harmonisk svingning er bare matematikkens ord for "en gentagende, bølgende bevægelse, der kommer af noget, der kører i ring". Det er derfor sinus og cosinus bruges til alt, der svinger i naturen.</p>
   `,
   formula: `
-    <div class="formula-card-sub">Trigonometri i en enhedscirkel (en cirkel med radius 1) og retvinklede trekanter.</div>
+    <div class="formula-card-sub">Den generelle harmoniske svingning.</div>
     
-    <p>For en vinkel <span data-math="\\theta" data-display="inline"></span> i enhedscirklen defineres sinus og cosinus som koordinaterne til retningspunktet <span data-math="P(x,y)" data-display="inline"></span>:</p>
-    <div data-math="cos(\\theta) = x"></div>
-    <div data-math="sin(\\theta) = y"></div>
-    <div data-math="tan(\\theta) = \\frac{sin(\\theta)}{cos(\\theta)} = \\frac{y}{x} \\quad (x \\neq 0)"></div>
-
-    <p style="margin-top: 20px;">I en retvinklet trekant defineres de ud fra sidernes forhold:</p>
+    <p>For at beskrive en bølge eller svingning bruger vi typisk funktionen for sinus eller cosinus med tre vigtige parametre:</p>
+    <div data-math="y(t) = A \\cdot \\sin(\\omega \\cdot t + \\phi)"></div>
+    
     <ul class="formula-desc-list">
-      <li><strong>Sinus:</strong> Modstående katete divideret med hypotenusen: <span data-math="sin(\\theta) = \\frac{\\text{modstående}}{\\text{hypotenuse}}" data-display="inline"></span></li>
-      <li><strong>Cosinus:</strong> Hosliggende katete divideret med hypotenusen: <span data-math="cos(\\theta) = \\frac{\\text{hosliggende}}{\\text{hypotenuse}}" data-display="inline"></span></li>
-      <li><strong>Tangens:</strong> Modstående katete divideret med hosliggende katete: <span data-math="tan(\\theta) = \\frac{\\text{modstående}}{\\text{hosliggende}}" data-display="inline"></span></li>
+      <li><strong><span data-math="A" data-display="inline"></span> (Amplitude):</strong> Bølgens højde (fra midten til toppen). Hvor voldsomt svinger den?</li>
+      <li><strong><span data-math="\\omega" data-display="inline"></span> (Vinkelfrekvens):</strong> Hvor hurtigt kører vi rundt i cirklen? Bestemmer hvor tæt bølgerne ligger. <span data-math="\\omega = 2\\pi \\cdot f" data-display="inline"></span>.</li>
+      <li><strong><span data-math="\\phi" data-display="inline"></span> (Faseforskydning):</strong> Hvor starter vi henne i cirklen til tiden <span data-math="t=0" data-display="inline"></span>? Forskyder bølgen sidelæns.</li>
     </ul>
 
-    <p style="margin-top: 20px;">For en bølge, der ændrer sig over tid <span data-math="t" data-display="inline"></span>, bruger vi formlen:</p>
-    <div data-math="y(t) = A \\cdot \\sin(\\omega t + \\phi)"></div>
-    <ul class="formula-desc-list">
-      <li><strong>A (Amplitude):</strong> Bølgens højde (hvor højt går hjulet op).</li>
-      <li><strong><span data-math="\\omega" data-display="inline"></span> (Vinkelfrekvens):</strong> Hvor hurtigt hjulet drejer rundt (<span data-math="\\omega = 2\\pi f" data-display="inline"></span>).</li>
-      <li><strong><span data-math="\\phi" data-display="inline"></span> (Faseforskydning):</strong> Hvor hjulet startede, da vi begyndte at tage tid.</li>
-    </ul>
+    <div style="margin-top: 30px; border-top: 1px solid var(--border-color); padding-top: 20px;">
+      <h4 style="margin-bottom: 10px; color: var(--accent-indigo);">Eksperimenter med Bølgens Parametre</h4>
+      <p style="font-size: 14px; margin-bottom: 15px; color: var(--text-secondary);">Træk i sliderne for direkte at se, hvordan den matematiske forskrift påvirker grafens udseende!</p>
+      
+      <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 15px;">
+        <div class="control-group">
+          <label class="control-label" style="color: white;">Amplitude (A): <span id="f-a-val" style="color:var(--accent-pink);">1.0</span></label>
+          <input type="range" class="slider-input" id="f-a-slider" min="0" max="2" step="0.1" value="1">
+        </div>
+        <div class="control-group">
+          <label class="control-label" style="color: white;">Frekvens (ω): <span id="f-w-val" style="color:var(--accent-emerald);">1.0</span></label>
+          <input type="range" class="slider-input" id="f-w-slider" min="0.5" max="4" step="0.1" value="1">
+        </div>
+        <div class="control-group">
+          <label class="control-label" style="color: white;">Fase (φ): <span id="f-p-val" style="color:var(--accent-blue);">0.0</span></label>
+          <input type="range" class="slider-input" id="f-p-slider" min="-3.14" max="3.14" step="0.1" value="0">
+        </div>
+      </div>
+
+      <div id="wave-container" style="width: 100%; height: 250px; background: var(--bg-primary); border-radius: var(--radius-md); border: 1px solid var(--border-color); overflow: hidden;"></div>
+    </div>
   `,
-  initVisualizer: (container, controls) => {
-    // Create Canvas
+  initVisualizer: (container, controls, formulaContainer) => {
+    // 1. MAIN VISUALIZER
     const canvas = document.createElement('canvas');
     canvas.className = 'visualizer-canvas';
     container.appendChild(canvas);
-
     const ctx = canvas.getContext('2d');
+    
     let animationId = null;
     let isPlaying = true;
-    let speed = 0.02;
-    let angle = 0;
-    let showWave = 'sin'; // 'sin', 'cos', 'both'
+    let t = 0;
+    
+    let showSin = true;
+    let showCos = false;
+    let waveSpeed = 0.05;
 
-    // Wave history
-    const waveHistory = [];
-    const maxHistory = 350;
-
-    // Controls setup
     controls.innerHTML = `
       <div class="control-group">
-        <label class="control-label">Frekvens (Hastighed): <span class="control-value" id="speed-val">2.0 Hz</span></label>
-        <input type="range" class="slider-input" id="speed-slider" min="0.005" max="0.08" step="0.005" value="0.02">
+        <label class="control-label">Vis funktioner:</label>
+        <div style="display: flex; gap: 15px;">
+          <label style="color: var(--accent-pink); display: flex; align-items: center; gap: 5px; cursor: pointer;">
+            <input type="checkbox" id="check-sin" checked> Sinus (Y-akse)
+          </label>
+          <label style="color: var(--accent-emerald); display: flex; align-items: center; gap: 5px; cursor: pointer;">
+            <input type="checkbox" id="check-cos"> Cosinus (X-akse)
+          </label>
+        </div>
       </div>
       <div class="control-group">
-        <label class="control-label">Vis funktion:</label>
-        <div class="btn-group">
-          <button class="control-btn" id="btn-show-sin" style="background-color: var(--accent-pink); color: white;">Sinus</button>
-          <button class="control-btn" id="btn-show-cos">Cosinus</button>
-          <button class="control-btn" id="btn-show-both">Begge</button>
-        </div>
+        <label class="control-label">Hastighed: <span class="control-value" id="speed-val">50%</span></label>
+        <input type="range" class="slider-input" id="speed-slider" min="1" max="100" value="50">
       </div>
       <div class="control-group">
         <label class="control-label">Handling:</label>
         <div class="btn-group">
-          <button class="control-btn" id="btn-play-pause">
-            <i class="fa-solid fa-pause"></i> <span id="play-text">Pause</span>
-          </button>
-          <button class="control-btn" id="btn-reset">Nulstil</button>
+          <button class="control-btn" id="btn-play-pause"><i class="fa-solid fa-pause"></i> <span>Pause</span></button>
         </div>
       </div>
     `;
 
-    // Hook controls
-    const speedSlider = document.getElementById('speed-slider');
-    const speedVal = document.getElementById('speed-val');
-    const btnPlayPause = document.getElementById('btn-play-pause');
-    const playText = document.getElementById('play-text');
-    const btnReset = document.getElementById('btn-reset');
-    const btnSin = document.getElementById('btn-show-sin');
-    const btnCos = document.getElementById('btn-show-cos');
-    const btnBoth = document.getElementById('btn-show-both');
+    document.getElementById('check-sin').addEventListener('change', (e) => { showSin = e.target.checked; });
+    document.getElementById('check-cos').addEventListener('change', (e) => { showCos = e.target.checked; });
 
-    speedSlider.addEventListener('input', (e) => {
-      speed = parseFloat(e.target.value);
-      speedVal.textContent = (speed * 100).toFixed(1) + ' Hz';
+    document.getElementById('speed-slider').addEventListener('input', (e) => {
+      const val = parseInt(e.target.value);
+      document.getElementById('speed-val').textContent = val + '%';
+      waveSpeed = val * 0.001;
     });
 
-    btnPlayPause.addEventListener('click', () => {
+    const btnPlay = document.getElementById('btn-play-pause');
+    btnPlay.addEventListener('click', () => {
       isPlaying = !isPlaying;
-      btnPlayPause.innerHTML = isPlaying 
-        ? '<i class="fa-solid fa-pause"></i> <span>Pause</span>' 
-        : '<i class="fa-solid fa-play"></i> <span>Start</span>';
+      btnPlay.innerHTML = isPlaying ? '<i class="fa-solid fa-pause"></i> <span>Pause</span>' : '<i class="fa-solid fa-play"></i> <span>Start</span>';
     });
 
-    btnReset.addEventListener('click', () => {
-      angle = 0;
-      waveHistory.length = 0;
-      if (!isPlaying) draw();
-    });
-
-    function updateActiveButton(activeBtn) {
-      [btnSin, btnCos, btnBoth].forEach(btn => {
-        btn.style.backgroundColor = 'var(--bg-tertiary)';
-        btn.style.color = 'var(--text-primary)';
-      });
-      if (activeBtn === 'sin') {
-        btnSin.style.backgroundColor = 'var(--accent-pink)';
-        btnSin.style.color = 'white';
-      } else if (activeBtn === 'cos') {
-        btnCos.style.backgroundColor = 'var(--accent-blue)';
-        btnCos.style.color = 'white';
-      } else {
-        btnBoth.style.backgroundColor = 'var(--accent-indigo)';
-        btnBoth.style.color = 'white';
+    let mainObserver = new ResizeObserver(() => {
+      const rect = container.getBoundingClientRect();
+      if(rect.width > 0) {
+        canvas.width = rect.width * window.devicePixelRatio;
+        canvas.height = rect.height * window.devicePixelRatio;
+        ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
       }
-    }
+    });
+    mainObserver.observe(container);
 
-    btnSin.addEventListener('click', () => { showWave = 'sin'; updateActiveButton('sin'); });
-    btnCos.addEventListener('click', () => { showWave = 'cos'; updateActiveButton('cos'); });
-    btnBoth.addEventListener('click', () => { showWave = 'both'; updateActiveButton('both'); });
+    const history = [];
+    const maxHistory = 400;
 
-    // Handle Canvas Sizing
-    function resize() {
-      const rect = canvas.getBoundingClientRect();
-      canvas.width = rect.width * window.devicePixelRatio;
-      canvas.height = rect.height * window.devicePixelRatio;
-      ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
-    }
-    
-    // Initial size
-    resize();
-    window.addEventListener('resize', resize);
-
-    // Animation Loop
-    function draw() {
-      const w = canvas.width / window.devicePixelRatio;
-      const h = canvas.height / window.devicePixelRatio;
-      
+    function drawMain() {
+      const w = canvas.width / window.devicePixelRatio || container.clientWidth;
+      const h = canvas.height / window.devicePixelRatio || container.clientHeight;
+      if(w===0) return;
       ctx.clearRect(0, 0, w, h);
 
-      // Define visual centers
-      const circleCenterX = w * 0.25;
-      const circleCenterY = h * 0.5;
-      const radius = Math.min(w * 0.15, h * 0.3);
-      const waveStartX = w * 0.5;
+      const circleCenter = { x: w * 0.25, y: h / 2 };
+      const radius = Math.min(w, h) * 0.3;
+      const waveStart = w * 0.5;
 
-      // Draw unit circle background
-      ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
-      ctx.lineWidth = 1;
-      ctx.beginPath();
-      ctx.arc(circleCenterX, circleCenterY, radius, 0, Math.PI * 2);
-      ctx.stroke();
+      const angle = t;
+      const px = circleCenter.x + radius * Math.cos(angle);
+      const py = circleCenter.y - radius * Math.sin(angle); // negative y because canvas y is down
 
-      // Draw X & Y axes for circle
-      ctx.beginPath();
-      ctx.moveTo(circleCenterX - radius - 20, circleCenterY);
-      ctx.lineTo(circleCenterX + radius + 20, circleCenterY);
-      ctx.moveTo(circleCenterX, circleCenterY - radius - 20);
-      ctx.lineTo(circleCenterX, circleCenterY + radius + 20);
-      ctx.stroke();
+      if (isPlaying) {
+        // store both sin and cos components
+        history.unshift({ sin: py, cos: px, rawT: t });
+        if (history.length > maxHistory) history.pop();
+        t += waveSpeed;
+      }
 
-      // Current Point on Circle
-      const px = circleCenterX + radius * Math.cos(-angle);
-      const py = circleCenterY + radius * Math.sin(-angle); // minus to rotate counter-clockwise on canvas
-
-      // Draw Rotating Arm
-      ctx.strokeStyle = 'rgba(255, 255, 255, 0.4)';
+      // Draw circle
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
       ctx.lineWidth = 2;
       ctx.beginPath();
-      ctx.moveTo(circleCenterX, circleCenterY);
-      ctx.lineTo(px, py);
+      ctx.arc(circleCenter.x, circleCenter.y, radius, 0, Math.PI * 2);
       ctx.stroke();
 
-      // Store history (y-coord for sine, x-coord for cosine relative to center)
-      if (isPlaying) {
-        waveHistory.unshift({
-          y: py - circleCenterY,
-          x: px - circleCenterX,
-          angle: angle
-        });
-        if (waveHistory.length > maxHistory) {
-          waveHistory.pop();
-        }
-      }
-
-      // Draw projections and wave lines
-      if (showWave === 'sin' || showWave === 'both') {
-        // Line from point on circle to sine wave start
-        ctx.strokeStyle = 'var(--accent-pink)';
-        ctx.lineWidth = 1;
-        ctx.setLineDash([4, 4]);
-        ctx.beginPath();
-        ctx.moveTo(px, py);
-        ctx.lineTo(waveStartX, py);
-        ctx.stroke();
-        ctx.setLineDash([]);
-
-        // Draw Sine wave
-        ctx.strokeStyle = 'var(--accent-pink)';
-        ctx.lineWidth = 3;
-        ctx.beginPath();
-        for (let i = 0; i < waveHistory.length; i++) {
-          const wx = waveStartX + i * ((w - waveStartX) / maxHistory);
-          const wy = circleCenterY + waveHistory[i].y;
-          if (i === 0) ctx.moveTo(wx, wy);
-          else ctx.lineTo(wx, wy);
-        }
-        ctx.stroke();
-      }
-
-      if (showWave === 'cos' || showWave === 'both') {
-        // Line from point on circle to cosine wave start (needs to project X coordinate)
-        ctx.strokeStyle = 'var(--accent-blue)';
-        ctx.lineWidth = 1;
-        ctx.setLineDash([4, 4]);
-        ctx.beginPath();
-        // For Cosine, we project the X coordinate onto the vertical axis
-        ctx.moveTo(px, py);
-        ctx.lineTo(px, circleCenterY - radius - 20); // project up
-        ctx.stroke();
-        ctx.setLineDash([]);
-
-        // Draw Cosine wave (rendered horizontally for comparison, or offset vertically)
-        ctx.strokeStyle = 'var(--accent-blue)';
-        ctx.lineWidth = 3;
-        ctx.beginPath();
-        for (let i = 0; i < waveHistory.length; i++) {
-          const wx = waveStartX + i * ((w - waveStartX) / maxHistory);
-          // Cosine wave uses the X coordinate offset as its amplitude offset
-          const wy = circleCenterY + waveHistory[i].x; 
-          if (i === 0) ctx.moveTo(wx, wy);
-          else ctx.lineTo(wx, wy);
-        }
-        ctx.stroke();
-      }
-
-      // Draw Rotating Point on circle
-      ctx.fillStyle = 'var(--text-primary)';
+      // Draw axes for circle
       ctx.beginPath();
-      ctx.arc(px, py, 6, 0, Math.PI * 2);
-      ctx.fill();
+      ctx.moveTo(circleCenter.x - radius - 10, circleCenter.y); ctx.lineTo(circleCenter.x + radius + 10, circleCenter.y);
+      ctx.moveTo(circleCenter.x, circleCenter.y - radius - 10); ctx.lineTo(circleCenter.x, circleCenter.y + radius + 10);
+      ctx.stroke();
 
-      // Axis labels
-      ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
-      ctx.font = '10px monospace';
-      ctx.fillText('0°', circleCenterX + radius + 5, circleCenterY + 12);
-      ctx.fillText('90°', circleCenterX - 8, circleCenterY - radius - 5);
-      ctx.fillText('180°', circleCenterX - radius - 30, circleCenterY + 12);
-      ctx.fillText('270°', circleCenterX - 13, circleCenterY + radius + 15);
+      // Draw radius line
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.8)';
+      ctx.beginPath(); ctx.moveTo(circleCenter.x, circleCenter.y); ctx.lineTo(px, py); ctx.stroke();
 
-      // Increment angle
-      if (isPlaying) {
-        angle += speed;
-        if (angle > Math.PI * 2) angle -= Math.PI * 2;
+      // Highlight active components on the circle axes
+      ctx.lineWidth = 3;
+      if (showSin) {
+        ctx.strokeStyle = 'var(--accent-pink)';
+        ctx.beginPath(); ctx.moveTo(px, circleCenter.y); ctx.lineTo(px, py); ctx.stroke();
+        
+        // Dotted line to wave
+        ctx.strokeStyle = 'rgba(236, 72, 153, 0.4)';
+        ctx.setLineDash([4, 4]);
+        ctx.beginPath(); ctx.moveTo(px, py); ctx.lineTo(waveStart, py); ctx.stroke();
+        ctx.setLineDash([]);
       }
+      if (showCos) {
+        ctx.strokeStyle = 'var(--accent-emerald)';
+        ctx.beginPath(); ctx.moveTo(circleCenter.x, py); ctx.lineTo(px, py); ctx.stroke();
+        
+        // Dotted line to wave
+        ctx.strokeStyle = 'rgba(16, 185, 129, 0.4)';
+        ctx.setLineDash([4, 4]);
+        ctx.beginPath(); ctx.moveTo(px, py); ctx.lineTo(waveStart, circleCenter.y - (px - circleCenter.x)); ctx.stroke();
+        ctx.setLineDash([]);
+      }
+
+      // Draw point on circle
+      ctx.fillStyle = 'var(--text-primary)';
+      ctx.beginPath(); ctx.arc(px, py, 6, 0, Math.PI * 2); ctx.fill();
+
+      // Draw wave axes
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
+      ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(waveStart, circleCenter.y); ctx.lineTo(w, circleCenter.y); ctx.stroke();
+
+      // Draw axis labels (pi, 2pi, etc) dynamically along the wave history
+      // We will place a marker every time rawT crosses a multiple of Math.PI/2
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
+      ctx.font = '11px monospace';
+      ctx.textAlign = 'center';
+      
+      // Look through history to find points close to multiples of pi/2
+      for (let i = 0; i < history.length; i++) {
+        const pt = history[i];
+        // checking modulo Math.PI/2
+        const m = pt.rawT % (Math.PI / 2);
+        if (m < waveSpeed * 1.5 || m > (Math.PI/2) - waveSpeed * 1.5) {
+          // This point is close to a multiple of pi/2
+          const exactMultiple = Math.round(pt.rawT / (Math.PI / 2));
+          if (i > 0 && Math.round(history[i-1].rawT / (Math.PI/2)) === exactMultiple) continue; // avoid duplicates
+
+          const waveX = waveStart + i * 2;
+          ctx.fillRect(waveX, circleCenter.y - 4, 1, 8);
+          
+          let label = "";
+          if (exactMultiple === 0) label = "0";
+          else if (exactMultiple === 1) label = "π/2";
+          else if (exactMultiple === 2) label = "π";
+          else if (exactMultiple === 3) label = "3π/2";
+          else if (exactMultiple % 2 === 0) label = (exactMultiple/2) + "π";
+          else label = exactMultiple + "π/2";
+          
+          ctx.fillText(label, waveX, circleCenter.y + 18);
+        }
+      }
+
+      // Draw wave history
+      ctx.lineWidth = 3;
+      if (showSin && history.length > 0) {
+        ctx.strokeStyle = 'var(--accent-pink)';
+        ctx.beginPath();
+        ctx.moveTo(waveStart, history[0].sin);
+        for (let i = 1; i < history.length; i++) {
+          ctx.lineTo(waveStart + i * 2, history[i].sin);
+        }
+        ctx.stroke();
+      }
+      if (showCos && history.length > 0) {
+        ctx.strokeStyle = 'var(--accent-emerald)';
+        ctx.beginPath();
+        ctx.moveTo(waveStart, circleCenter.y - (history[0].cos - circleCenter.x));
+        for (let i = 1; i < history.length; i++) {
+          ctx.lineTo(waveStart + i * 2, circleCenter.y - (history[i].cos - circleCenter.x));
+        }
+        ctx.stroke();
+      }
+    }
+
+
+    // 2. FORMULA VISUALIZER (Interactive Wave)
+    let fCanvas = null;
+    let fCtx = null;
+    let fObserver = null;
+    let fA = 1.0;
+    let fW = 1.0;
+    let fP = 0.0;
+
+    function initFormulaWave() {
+      const fContainer = document.getElementById('wave-container');
+      if (!fContainer) { setTimeout(initFormulaWave, 100); return; }
+
+      const sA = document.getElementById('f-a-slider');
+      const vA = document.getElementById('f-a-val');
+      const sW = document.getElementById('f-w-slider');
+      const vW = document.getElementById('f-w-val');
+      const sP = document.getElementById('f-p-slider');
+      const vP = document.getElementById('f-p-val');
+
+      sA.addEventListener('input', (e) => { fA = parseFloat(e.target.value); vA.textContent = fA.toFixed(1); drawFormulaWave(); });
+      sW.addEventListener('input', (e) => { fW = parseFloat(e.target.value); vW.textContent = fW.toFixed(1); drawFormulaWave(); });
+      sP.addEventListener('input', (e) => { fP = parseFloat(e.target.value); vP.textContent = fP.toFixed(1); drawFormulaWave(); });
+
+      fCanvas = document.createElement('canvas');
+      fCanvas.style.width = '100%'; fCanvas.style.height = '100%';
+      fContainer.appendChild(fCanvas);
+      fCtx = fCanvas.getContext('2d');
+
+      fObserver = new ResizeObserver(() => {
+        const rect = fContainer.getBoundingClientRect();
+        if(rect.width > 0) {
+          fCanvas.width = rect.width * window.devicePixelRatio;
+          fCanvas.height = rect.height * window.devicePixelRatio;
+          fCtx.scale(window.devicePixelRatio, window.devicePixelRatio);
+          drawFormulaWave();
+        }
+      });
+      fObserver.observe(fContainer);
+    }
+    initFormulaWave();
+
+    function drawFormulaWave() {
+      if(!fCtx) return;
+      const w = fCanvas.width / window.devicePixelRatio;
+      const h = fCanvas.height / window.devicePixelRatio;
+      if(w===0) return;
+      fCtx.clearRect(0,0,w,h);
+
+      const centerY = h / 2;
+      const maxAmplitude = (h / 2) * 0.7;
+      
+      // Axes
+      fCtx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
+      fCtx.lineWidth = 1;
+      fCtx.beginPath();
+      fCtx.moveTo(0, centerY); fCtx.lineTo(w, centerY);
+      fCtx.stroke();
+
+      // Grid/Ticks on X axis (representing Pi)
+      fCtx.fillStyle = 'rgba(255, 255, 255, 0.5)';
+      fCtx.font = '12px monospace';
+      fCtx.textAlign = 'center';
+      
+      const pixelsPerPi = 60; // 60 pixels = Pi
+
+      for (let i = 0; i * pixelsPerPi < w; i++) {
+        const px = i * pixelsPerPi;
+        fCtx.fillRect(px, centerY - 5, 1, 10);
+        let label = i === 0 ? "0" : (i === 1 ? "π" : i + "π");
+        if (i > 0) fCtx.fillText(label, px, centerY + 20);
+      }
+
+      // Grid/Ticks on Y axis
+      fCtx.fillRect(0, centerY - maxAmplitude, 10, 1);
+      fCtx.textAlign = 'left';
+      fCtx.fillText("1", 15, centerY - maxAmplitude + 4);
+      fCtx.fillRect(0, centerY + maxAmplitude, 10, 1);
+      fCtx.fillText("-1", 15, centerY + maxAmplitude + 4);
+
+      // Wave
+      fCtx.strokeStyle = 'var(--accent-indigo)';
+      fCtx.lineWidth = 3;
+      fCtx.beginPath();
+      for(let x = 0; x < w; x++) {
+        // x represents time t. scale it so pixelsPerPi = PI in math.
+        const tVal = (x / pixelsPerPi) * Math.PI;
+        const y = centerY - (fA * Math.sin(fW * tVal + fP)) * maxAmplitude;
+        if(x===0) fCtx.moveTo(x, y);
+        else fCtx.lineTo(x, y);
+      }
+      fCtx.stroke();
     }
 
     function animate() {
-      draw();
+      drawMain();
       animationId = requestAnimationFrame(animate);
     }
-    
     animate();
 
-    // Return cleanup function
     return () => {
       cancelAnimationFrame(animationId);
-      window.removeEventListener('resize', resize);
+      mainObserver.disconnect();
+      if(fObserver) fObserver.disconnect();
     };
   }
 };
